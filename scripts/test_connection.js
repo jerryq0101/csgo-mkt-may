@@ -76,9 +76,13 @@ function convertEnglishToDate(englishDate) {
     // Your implementation here...
     // GET Request to SteamAPI
     const response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
+
+    if (response.status == 429) {
+        console.log(response)
+        return 429;
+    }
+
     const responseJson = await response.json();
-    console.log("Item Name:", responseJson.market_hash_name)
-    console.log("Item Price History:", responseJson.median_avg_prices_10000days)
 
     let itemPriceHistoryObjFormArr = []
     // Reformat the array to be more readable
@@ -96,6 +100,13 @@ function convertEnglishToDate(englishDate) {
 
     return itemPriceHistoryObjFormArr;
   }
+  
+async function existsInCollection(itemName, collection) {
+    const query = { name: itemName };
+    const result = await collection.findOne(query);
+    return result !== null;
+}
+  
   
   // A delay function (for api limits)
   function delay(ms) {
@@ -126,6 +137,11 @@ function convertEnglishToDate(englishDate) {
 
     // Loop through each existing csgo item and add it to the collection
     for (const item of itemsStrings) {
+        // Check if the item has already been added to the collection
+        if (await existsInCollection(item, collection)) {
+            console.log("Item already exists in collection:", item);
+            continue;
+        }
         console.log("Processing item:", item)
       if (minuteRequests >= 100) {
         // If we've hit the rate limit for the minute, wait until the next minute
@@ -142,6 +158,14 @@ function convertEnglishToDate(englishDate) {
       // Within minute and daily limits, fetch data for the item and store it.
       try {
         const data = await queryPrice(item);
+
+        if (data == 429) {
+            // If we've hit the rate limit for the day, wait until the next day
+            console.log("Failed to fetch data for item:", item)
+            await delay(86400000);
+            dailyRequests = 0;
+        }
+
         await writeMongoDB({
             name: item,
             price_history: data
