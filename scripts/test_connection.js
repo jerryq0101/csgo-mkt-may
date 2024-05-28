@@ -35,6 +35,16 @@ async function writeMongoDB(data, collection, client) {
     console.log(`Successfully inserted ${data} into the collection`)
 }
 
+async function updatePricesMongoDB(itemName, collection, client) {
+    console.log("Updating prices for item:", itemName);
+    const replacementPrices = await queryPrice(itemName);
+    await collection.replaceOne({ name: itemName }, {
+        name: itemName,
+        price_history: replacementPrices
+    });
+    console.log("Successfully updated prices for item:", itemName);
+}
+
 function convertEnglishToDate(englishDate) {
     const dateArr = englishDate.split(" ");
 
@@ -72,20 +82,46 @@ function convertEnglishToDate(englishDate) {
     return `${dateArr[2]}-${month}-${dateArr[1]}`;
 }
 
-  async function queryPrice(itemName) {
-    // Your implementation here...
+let minuteRequests = 0;
+let dailyRequests = 0;
+
+async function queryPrice(itemName) {
+    // Handle API Limits
+    if (minuteRequests >= 100) {
+        // If we've hit the rate limit for the minute, wait until the next minute
+        await delay(60000);
+        minuteRequests = 0;
+    }
+
+    // For clean request starts
+    if (dailyRequests >= 5000) {
+        // If we've hit the rate limit for the day, wait until the next day
+        await delay(86400000);
+        dailyRequests = 0;
+    }
+
     // GET Request to SteamAPI
     const response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
 
+    // For unclean request starts
     if (response.status == 429) {
         console.log(response)
-        return 429;
+        await delay(86400000);
+        dailyRequests = 0;
+    } 
+    
+    if (response.status != 200) {
+        console.log(response)
+        return response.status;
+    } else {
+        minuteRequests++;
+        dailyRequests++;
     }
 
     const responseJson = await response.json();
 
-    let itemPriceHistoryObjFormArr = []
     // Reformat the array to be more readable
+    let itemPriceHistoryObjFormArr = []
     for (const instance of responseJson.median_avg_prices_10000days) {
         // Process the date
         let dateFormatted = convertEnglishToDate(instance[0]);
@@ -99,33 +135,40 @@ function convertEnglishToDate(englishDate) {
     }
 
     return itemPriceHistoryObjFormArr;
-  }
-  
+}
+
 async function existsInCollection(itemName, collection) {
     const query = { name: itemName };
     const result = await collection.findOne(query);
-    return result !== null;
+    return result;
 }
-  
-  
-  // A delay function (for api limits)
-  function delay(ms) {
+
+function isLatestPrices(data) {
+    // check for like 4 days behind (long term investors only)
+    const lastDay = data[data.length - 1];
+    const dateString = lastDay.date;
+    const date = new Date(dateString);
+    const today = new Date();
+
+    // Check that the difference between the last date and today is less than 4 days
+    return today - date <= 345600000;
+}
+
+// A delay function (for api limits)
+function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-  
-  let minuteRequests = 0;
-  let dailyRequests = 0;
-  
-  // This function should only be called once
-  async function fetchData() {
+}
+
+// This function should only be called once
+async function fetchData() {
     const itemsWithProperties = data.data;
     const itemsStrings = itemsWithProperties.map(item => item.market_hash_name);
 
     // Setup Mongo
-    const {collection, client} = await setup();
+    const { collection, client } = await setup();
 
     // // Test process 
-    // console.log("Begin process")
+    // console.log("Begin process")r
     // const itemName = "AK-47 | Redline (Field-Tested)"
     // const stepOne = await queryPrice(itemName);
     // console.log(stepOne)
@@ -138,54 +181,47 @@ async function existsInCollection(itemName, collection) {
     // Loop through each existing csgo item and add it to the collection
     for (const item of itemsStrings) {
         // Check if the item has already been added to the collection
-        if (await existsInCollection(item, collection)) {
+        const exists = await existsInCollection(item, collection)
+
+        if (exists) {
+            // Check if the item has the latest date prices
+            if (!isLatestPrices(exists.price_history)) {
+                // If the item doesn't have the latest prices, update the prices
+                await updatePricesMongoDB(item, collection, client);
+            }
             console.log("Item already exists in collection:", item);
             continue;
         }
         console.log("Processing item:", item)
-      if (minuteRequests >= 100) {
-        // If we've hit the rate limit for the minute, wait until the next minute
-        await delay(60000);
-        minuteRequests = 0;
-      }
-    
-      if (dailyRequests >= 5000) {
-        // If we've hit the rate limit for the day, wait until the next day
-        await delay(86400000);
-        dailyRequests = 0;
-      }
-    
-      // Within minute and daily limits, fetch data for the item and store it.
-      try {
-        const data = await queryPrice(item);
 
-        if (data == 429) {
-            // If we've hit the rate limit for the day, wait until the next day
-            console.log("Failed to fetch data for item:", item)
-            await delay(86400000);
-            dailyRequests = 0;
-        }
+        // Within minute and daily limits, fetch data for the item and store it.
+        try {
+            const data = await queryPrice(item);
+            
+            // If Error
+            if (Number.isInteger(data)) {
+                console.log("Failed to fetch data, automatically returning")
+                return;
+            }
 
-        await writeMongoDB({
-            name: item,
-            price_history: data
-        }, collection, client);
-        minuteRequests++;
-        dailyRequests++;
-        console.log("Successfully fetched data for item:", item)
-        
+            await writeMongoDB({
+                name: item,
+                price_history: data
+            }, collection, client);
+
+            console.log("Successfully fetched data for item:", item)
+
         } catch (error) {
             console.error(`Failed to fetch data for item: ${item}`, error);
         }
     }
-    
-    
+
     // Why running the program was returning an client closed error:
     // Sol'n: Because the linear execution process of non await lines,
     // when calling collection.insertOne(), the operation is a process that isn't finished yet
     // thus causing the client.close() to be called before the insertOne() operation is finished
     // so make sure to await any operation that is dealing with external resources.
     await client.close()
-  }
+}
 
-  fetchData();
+fetchData();
