@@ -97,7 +97,7 @@ async function queryPrice(itemName) {
         await delay(86400000);
         dailyRequests = 0;
     } else if (response.status != 200) {
-        throw new Error("Failed to fetch data, automatically returning, not 200 or 429", response)
+        throw new Error("Failed to fetch data, automatically returning, not 200 or 429 error codes", response)
     } else {
         minuteRequests++;
         dailyRequests++;
