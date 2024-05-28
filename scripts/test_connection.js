@@ -4,7 +4,7 @@ import data from "../misc/items_list.json" assert { type: 'json' };
 import { MongoClient, ServerApiVersion } from "mongodb";
 const uri = process.env.MONGO_CONNECTION_STRING;
 const apikey = process.env.STEAM_API_KEY;
-const steamApiUrl = "https://api.steamapis.com/market/item/730/"
+const steamApiUrl = "https://api.steamapis.com/market/item/730/";
 
 // Connect operation to MongoDB, should return a necessary object of needed elements
 async function setup() {
@@ -36,8 +36,8 @@ async function setup() {
 async function insertMongoDB(data, collection, client) {
     try {
         // Insert one specific item to the collection
-        await collection.insertOne(data)
-        console.log(`Successfully inserted ${data} into the collection`)
+        await collection.insertOne(data);
+        console.log(`Successfully inserted ${data} into the collection`);
     } catch (error) {
         throw new Error(`Failed to insert data into the collection: ${error}`);
     }
@@ -47,7 +47,7 @@ async function updatePricesMongoDB(itemName, collection, client) {
     console.log("Updating prices for item:", itemName);
     const replacementPrices = await queryPrice(itemName);
     if (Number.isInteger(replacementPrices)) {
-        throw new Error("Failed to fetch data, automatically returning")
+        throw new Error("Failed to fetch data, automatically returning");
     }
     try {
         await collection.replaceOne({ name: itemName }, {
@@ -93,11 +93,11 @@ async function queryPrice(itemName) {
 
     // For unclean request starts
     if (response.status == 429) {
-        console.log(response)
+        console.log(response);
         await delay(86400000);
         dailyRequests = 0;
     } else if (response.status != 200) {
-        throw new Error("Failed to fetch data, automatically returning, not 200 or 429 error codes", response)
+        throw new Error("Failed to fetch data, automatically returning, not 200 or 429 error codes", response);
     } else {
         minuteRequests++;
         dailyRequests++;
@@ -208,31 +208,32 @@ async function fetchData() {
 
     // Loop through each existing csgo item and add it to the collection
     for (const item of itemsStrings) {
+        console.log("Processing item:", item);
         // Check if the item has already been added to the collection
-        const exists = await existsInCollection(item, collection)
+        const exists = await existsInCollection(item, collection);
         
         if (exists) {
             // Check if the item has the latest date prices
             if (!isLatestPrices(exists.price_history)) {
                 // If the item doesn't have the latest prices, update the prices
                 await updatePricesMongoDB(item, collection, client);
-                console.log("Updated prices for item:", item)
+                console.log("Updated prices for item:", item);
             } else {
                 console.log("Item prices are the latest in collection:", item);
                 continue;
             }
         }
-        console.log("Processing item:", item)
+        
 
         // Within minute and daily limits, fetch data for the item and store it.
         try {
             const data = await queryPrice(item);
-            
+
             await insertMongoDB({
                 name: item,
                 price_history: data
             }, collection, client);
-            console.log("Successfully fetched data for a new item:", item)
+            console.log("Successfully fetched data for a new item:", item);
         } catch (error) {
             console.error(`Failed to fetch data for the new item: ${item}`, error);
             return;
@@ -244,7 +245,7 @@ async function fetchData() {
     // when calling collection.insertOne(), the operation is a process that isn't finished yet
     // thus causing the client.close() to be called before the insertOne() operation is finished
     // so make sure to await any operation that is dealing with external resources.
-    await client.close()
+    await client.close();
 }
 
 fetchData();
