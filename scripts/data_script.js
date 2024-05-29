@@ -62,12 +62,8 @@ async function updatePricesMongoDB(itemName, collection, client) {
 
 async function existsInCollection(itemName, collection) {
     const query = { name: itemName };
-    try {
-        const result = await collection.findOne(query);
-        return result;
-    } catch (error) {
-        throw new Error(`Failed to find item in collection: ${error}`);
-    }
+    const result = await collection.findOne(query);
+    return result;
 }
 
 let minuteRequests = 0;
@@ -161,7 +157,7 @@ function convertEnglishToDate(englishDate) {
 }
 
 function isLatestPrices(data) {
-    // check for like 4 days behind (long term investors only)
+    // check for like 4 days behind
     const lastDay = data[data.length - 1];
     const dateString = lastDay.date;
     const date = new Date(dateString);
@@ -212,6 +208,7 @@ async function fetchData() {
         // Check if the item has already been added to the collection
         const exists = await existsInCollection(item, collection);
         
+        // if exists, update prices
         if (exists) {
             // Check if the item has the latest date prices
             if (!isLatestPrices(exists.price_history)) {
@@ -222,21 +219,21 @@ async function fetchData() {
                 console.log("Item prices are the latest in collection:", item);
                 continue;
             }
-        }
-        
-
-        // Within minute and daily limits, fetch data for the item and store it.
-        try {
-            const data = await queryPrice(item);
-
-            await insertMongoDB({
-                name: item,
-                price_history: data
-            }, collection, client);
-            console.log("Successfully fetched data for a new item:", item);
-        } catch (error) {
-            console.error(`Failed to fetch data for the new item: ${item}`, error);
-            return;
+        // if doesn't exist, insert new item
+        } else {
+            // Within minute and daily limits, fetch data for the item and store it.
+            try {
+                const data = await queryPrice(item);
+    
+                await insertMongoDB({
+                    name: item,
+                    price_history: data
+                }, collection, client);
+                console.log("Successfully queried and inserted data for a new item:", item);
+            } catch (error) {
+                console.error(`Failed to fetch data for the new item: ${item}`, error);
+                return;
+            }
         }
     }
 
