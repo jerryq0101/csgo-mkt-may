@@ -182,8 +182,7 @@ function delay(ms) {
 // This script should be run once every week (Allowing for all items to be fetched in API rate limits, and prices to not be too behind)
 
 async function fetchData() {
-    const itemsWithProperties = data.data;
-    const itemsStrings = itemsWithProperties.map(item => item.market_hash_name);
+    const itemsStrings = Object.keys(data);
 
     // Setup Mongo
     const { collection, client } = await setup();
@@ -213,7 +212,7 @@ async function fetchData() {
                 await updatePricesMongoDB(item, collection, client);
                 console.log("Successfully updated prices for item:", item);
             } else {
-                console.log("Item prices are the latest in collection:", item);
+                console.log("Item prices are already the latest in collection:", item);
                 continue;
             }
         // if doesn't exist, insert new item
@@ -226,9 +225,9 @@ async function fetchData() {
                     name: item,
                     price_history: data
                 }, collection, client);
-                console.log("Successfully gotten new data for a new item:", item);
+                console.log("Successfully grabbed new item:", item);
             } catch (error) {
-                console.error(`Failed to get for the new item: ${item}`, error);
+                console.error(`Failed to grab new item: ${item}`, error);
                 return;
             }
         }
