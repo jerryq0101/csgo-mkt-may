@@ -46,17 +46,14 @@ async function insertMongoDB(data, collection, client) {
 async function updatePricesMongoDB(itemName, collection, client) {
     console.log("Updating prices for item:", itemName);
     const replacementPrices = await queryPrice(itemName);
-    if (Number.isInteger(replacementPrices)) {
-        throw new Error("Failed to fetch data, automatically returning");
-    }
     try {
         await collection.replaceOne({ name: itemName }, {
             name: itemName,
             price_history: replacementPrices
         });
-        console.log("Successfully updated prices for item:", itemName);
+        console.log("Successfully replaced previous price data for item:", itemName);
     } catch (error) {
-        throw new Error(`Failed to update prices for item (Mongo Replace): ${itemName}`, error);
+        throw new Error(`Failed to replace previous prices for item (Mongo Replace): ${itemName}`, error);
     }
 }
 
@@ -214,7 +211,7 @@ async function fetchData() {
             if (!isLatestPrices(exists.price_history)) {
                 // If the item doesn't have the latest prices, update the prices
                 await updatePricesMongoDB(item, collection, client);
-                console.log("Updated prices for item:", item);
+                console.log("Successfully updated prices for item:", item);
             } else {
                 console.log("Item prices are the latest in collection:", item);
                 continue;
@@ -229,9 +226,9 @@ async function fetchData() {
                     name: item,
                     price_history: data
                 }, collection, client);
-                console.log("Successfully queried and inserted data for a new item:", item);
+                console.log("Successfully gotten new data for a new item:", item);
             } catch (error) {
-                console.error(`Failed to fetch data for the new item: ${item}`, error);
+                console.error(`Failed to get for the new item: ${item}`, error);
                 return;
             }
         }
