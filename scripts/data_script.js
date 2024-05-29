@@ -37,7 +37,7 @@ async function insertMongoDB(data, collection, client) {
     try {
         // Insert one specific item to the collection
         await collection.insertOne(data);
-        console.log(`Successfully inserted ${data} into the collection`);
+        console.log(`Successfully inserted ${data.name} into the collection`);
     } catch (error) {
         throw new Error(`Failed to insert data into the collection: ${error}`);
     }
