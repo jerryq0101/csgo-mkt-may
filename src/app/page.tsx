@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Chart from "@/components/Chart";
 
 export default function Home() {
   return (
@@ -108,6 +109,7 @@ export default function Home() {
           </p>
         </a>
       </div>
+      <Chart />
     </main>
   );
 }
