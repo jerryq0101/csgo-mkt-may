@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import data from "../misc/items_list.json" assert { type: 'json' };
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient } from "mongodb";
 const uri = process.env.MONGO_CONNECTION_STRING;
 const apikey = process.env.STEAM_API_KEY;
 const steamApiUrl = "https://api.steamapis.com/market/item/730/";
@@ -63,37 +63,28 @@ async function existsInCollection(itemName, collection) {
     return result;
 }
 
-let minuteRequests = 0;
-let dailyRequests = 0;
 
 async function queryPrice(itemName) {
-    // Handle API Limits
-    if (minuteRequests >= 100) {
-        // If we've hit the rate limit for the minute, wait until the next minute
-        await delay(60000);
-        minuteRequests = 0;
-    }
+    // Condition: 
+    // Unless the response is 429, or not 200, the function returns an array of objects (name and price)
+    // Otherwise, it throws an error and stops the whole program
 
-    // For clean request starts
-    if (dailyRequests >= 5000) {
-        // If we've hit the rate limit for the day, wait until the next day
-        await delay(86400000);
-        dailyRequests = 0;
-    }
-
-    // GET Request to SteamAPI
+    // GET Request to SteamAPI 
     const response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
 
-    // For unclean request starts
     if (response.status == 429) {
+        // If we've hit the rate limit for the day/minute, wait until the next day/minute to continue
+        // Then redo the function to try again
         console.log(response);
-        await delay(86400000);
+        const bestWaitTime = handleRateLimit(response);
+        await delay(bestWaitTime);
         dailyRequests = 0;
+        
+        // Fetch the item again
+        response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
     } else if (response.status != 200) {
+        // If the response is not 200, throw an error, ending the program
         throw new Error("Failed to fetch data, automatically returning, not 200 or 429 error codes", response);
-    } else {
-        minuteRequests++;
-        dailyRequests++;
     }
 
     const responseJson = await response.json();
@@ -162,6 +153,22 @@ function isLatestPrices(data) {
 
     // Check that the difference between the last date and today is less than 4 days
     return today - date <= 345600000;
+}
+
+function handleRateLimit(response) {
+    const current = Date.now();
+    const dayExpires = response.headers.get("x-sa-requests-day-expires");
+    const minuteExpires = response.headers.get("x-sa-requests-minute-expires");
+    const dayRequests = response.headers.get("x-sa-requests-day");
+
+    // if day over the rate, wait until the day expires 
+    if (dayRequests >= 5000) {
+        return dayExpires - current;
+    } 
+    // if minute over the rate, wait until the minute expires
+    else {
+        return minuteExpires - current;
+    } 
 }
 
 function delay(ms) {
