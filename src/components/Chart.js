@@ -11,9 +11,17 @@ export default function Chart(props) {
             layout:  {
                 background: {type: ColorType.Solid, color: 'white'}
             },
-            width: chartContainerRef.current.innerWidth,
-            height: chartContainerRef.current.innerHeight,
+            width: chartContainerRef.current.clientWidth,
+            height: 300,
         });
+        chart.timeScale().fitContent();
+
+        // Function to handle resize
+        function handleResize() {
+            chart.applyOptions({
+                width: chartContainerRef.current.clientWidth,
+            });
+        }
 
         const newSeries = chart.addAreaSeries({
             lineColor: "#2962FF",
@@ -34,8 +42,13 @@ export default function Chart(props) {
             { time: '2018-12-31', value: 22.67 },
         ])
 
-        return () => chart.remove();
-    })
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            chart.remove();
+        }
+    }, [])
 
     return (
         <div ref={chartContainerRef} className="w-full h-96" />
