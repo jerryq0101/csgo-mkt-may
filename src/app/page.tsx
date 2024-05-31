@@ -28,7 +28,7 @@ async function getData(): Promise<ConnectionStatus> {
     }
   }
 }
- 
+
 
 export default async function Home() {
   const { isConnected, collection } = await getData();

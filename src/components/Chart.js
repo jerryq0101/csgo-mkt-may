@@ -4,8 +4,8 @@ import React, { useEffect, useRef, useContext } from 'react';
 import { createChart, ColorType } from 'lightweight-charts';
 import { GlobalContext } from '../app/GlobalContext';
 
-export default function Chart(props) {
-    const { data } = useContext(GlobalContext);
+export default function Chart() {
+    const { data, loading } = useContext(GlobalContext);
 
     const chartContainerRef = useRef();
 
@@ -40,7 +40,7 @@ export default function Chart(props) {
             window.removeEventListener('resize', handleResize);
             chart.remove();
         }
-    }, [data])
+    }, [data, loading])
 
     return (
         <div ref={chartContainerRef} className="w-full h-96" />

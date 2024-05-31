@@ -6,19 +6,21 @@ import TextField from '@mui/material/TextField';
 
 export default function Search() {
     const [search, setSearch] = useState("");
-    const { query, setQuery } = useContext(GlobalContext);
+    const { setQuery } = useContext(GlobalContext);
     
-    function handleSearchChange(e) {
-        setSearch(e.target.value);
-        setQuery(search)
-        console.log(query)
+    const handleSearchChange = (event) => {
+        const newSearchValue = event.target.value;
+        setSearch(newSearchValue);
+        setQuery(newSearchValue);
+        console.log("Search Text from Search Component: ", newSearchValue)
     }
 
     return (
         <div>
-            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            onChange={handleSearchChange} 
-            value={search}
+            <input 
+                value={search}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                onChange={handleSearchChange} 
             >
             </input>
         </div>

@@ -9,13 +9,25 @@ export function GlobalContextComponent({ children }) {
     const [loading, setLoading] = useState(true);
 
     function getArrayFromResponseJson(rawData) {
+        console.log(rawData.data.price_history)
         const array = rawData.data.price_history;
         
         // Filter out the volume data for now
         const filteredArray = array.map(item => {
+            // To deal with single digit months not working for tradingview
+            const year = item.date.split("-")[0];
+            let month = item.date.split("-")[1];
+            let day = item.date.split("-")[2];
+            
+            if (month.length == 1) {
+                month = "0" + month;
+            } 
+            if (day.length == 1) {
+                day = "0" + day;
+            }
             return {
-                date: item.date,
-                price: item.median_price
+                time: `${year}-${month}-${day}`,
+                value: item.median_price
             }
         })
 
@@ -27,12 +39,17 @@ export function GlobalContextComponent({ children }) {
         // and set data, then set loading to be false
         if (query) {
             setLoading(true);
-            console.log("query", query)
-            fetch(`/api?name=${query}`).then(res => res.json())
+            console.log("Query Item Text from Global Context: ", query)
+            const name = encodeURIComponent(query);
+            
+            fetch(`/api?name=${name}`)
+                .then(res => res.json())
                 .then(data => {
-                    getArrayFromResponseJson(data);
-                    setData(getArrayFromResponseJson(data));
-                    setLoading(false);
+                    if (data.data) {
+                        console.log(data)
+                        const processedData = getArrayFromResponseJson(data);
+                        setData(processedData);
+                    }
                 })
         } else {
             setData([
@@ -51,7 +68,7 @@ export function GlobalContextComponent({ children }) {
     }, [query]);
 
     return (
-        <GlobalContext.Provider value={{ data, loading, query, setQuery}}>
+        <GlobalContext.Provider value={{ data, loading, query, setQuery }}>
             {children}
         </GlobalContext.Provider>
     );
