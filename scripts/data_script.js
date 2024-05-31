@@ -79,8 +79,9 @@ async function queryPrice(itemName) {
         console.log("JSON'd version:", response);
 
         const bestWaitTimeSeconds = handleRateLimit(response);
-        console.log(`Waiting for ${bestWaitTimeSeconds} seconds`)
+        console.log(`Waiting for ${bestWaitTimeSeconds + 5} seconds`)
         // Delay is in ms so convert from seconds to ms
+            // Added a buffer period here to prevent any issues
         await delay(bestWaitTimeSeconds * 1000 + 5000);
         
         // Fetch the item again
