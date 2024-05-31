@@ -63,22 +63,25 @@ async function existsInCollection(itemName, collection) {
     return result;
 }
 
-
 async function queryPrice(itemName) {
     // Condition: 
     // Unless the response is 429, or not 200, the function returns an array of objects (name and price)
     // Otherwise, it throws an error and stops the whole program
 
     // GET Request to SteamAPI 
-    const response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
+    let response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
 
     if (response.status == 429) {
         // If we've hit the rate limit for the day/minute, wait until the next day/minute to continue
         // Then redo the function to try again
-        console.log(response);
-        const bestWaitTime = handleRateLimit(response);
-        await delay(bestWaitTime);
-        dailyRequests = 0;
+        console.log("Non-json'd version:", response);
+        response = await response.json();
+        console.log("JSON'd version:", response);
+
+        const bestWaitTimeSeconds = handleRateLimit(response);
+        console.log(`Waiting for ${bestWaitTimeSeconds} seconds`)
+        // Delay is in ms so convert from seconds to ms
+        await delay(bestWaitTimeSeconds * 1000);
         
         // Fetch the item again
         response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
@@ -155,19 +158,28 @@ function isLatestPrices(data) {
     return today - date <= 345600000;
 }
 
+// Dealing with json'd version of the response
 function handleRateLimit(response) {
-    const current = Date.now();
-    const dayExpires = response.headers.get("x-sa-requests-day-expires");
-    const minuteExpires = response.headers.get("x-sa-requests-minute-expires");
-    const dayRequests = response.headers.get("x-sa-requests-day");
+    let current = Date.now();
+    let seconds = Math.ceil(current / 1000);
+    const dayExpires = Math.ceil(response.requests.day.expiresAt);
+    const minuteExpires = Math.ceil(response.requests.minute.expiresAt);
+    const dayRequests = Math.ceil(response.requests.day.hits);
+
+    console.log("dayExpires Type:", typeof dayExpires);
+    console.log("dayexpires:", dayExpires)
+    console.log("minuteExpires Type:", typeof minuteExpires);
+    console.log("minuteExpires:", minuteExpires);
+    console.log("dayRequests Type:", typeof dayRequests);
+    console.log("dayRequests:", dayRequests);
 
     // if day over the rate, wait until the day expires 
     if (dayRequests >= 5000) {
-        return dayExpires - current;
+        return dayExpires - seconds;
     } 
     // if minute over the rate, wait until the minute expires
     else {
-        return minuteExpires - current;
+        return minuteExpires - seconds;
     } 
 }
 
