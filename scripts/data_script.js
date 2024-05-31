@@ -81,7 +81,7 @@ async function queryPrice(itemName) {
         const bestWaitTimeSeconds = handleRateLimit(response);
         console.log(`Waiting for ${bestWaitTimeSeconds} seconds`)
         // Delay is in ms so convert from seconds to ms
-        await delay(bestWaitTimeSeconds * 1000);
+        await delay(bestWaitTimeSeconds * 1000 + 5000);
         
         // Fetch the item again
         response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
