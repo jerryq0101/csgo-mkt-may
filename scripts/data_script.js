@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import data from "../misc/items_list.json" assert { type: 'json' };
+import specificData from "../misc/specific_item.json" assert { type: 'json' };
 import { MongoClient } from "mongodb";
 const uri = process.env.MONGO_CONNECTION_STRING;
 const apikey = process.env.STEAM_API_KEY;
@@ -88,6 +89,14 @@ async function queryPrice(itemName) {
         response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
     } else if (response.status != 200) {
         // If the response is not 200, throw an error, ending the program
+        // ERROR came here, maybe just make it wait, since it's an api response issue, not something with the item
+        // waiting fixed the issue for postman, I could call the api in the same day again
+        // Run the program again and check for what status the response is and how to handle it
+        console.log("This response is not 200 or 429");
+        console.log("Non-json'd version:", response);
+        response = await response.json();
+        console.log("JSON'd version:", response);
+
         throw new Error("Failed to fetch data, automatically returning, not 200 or 429 error codes", response);
     }
 
@@ -202,7 +211,7 @@ function delay(ms) {
 // This script should be run once every week (Allowing for all items to be fetched in API rate limits, and prices to not be too behind)
 
 async function fetchData() {
-    const itemsStrings = Object.keys(data);
+    const itemsStrings = Object.keys(specificData);
 
     // Setup Mongo
     const { collection, client } = await setup();
