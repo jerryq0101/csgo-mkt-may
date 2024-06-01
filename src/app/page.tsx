@@ -6,12 +6,15 @@ import { GlobalContextComponent } from "@/app/GlobalContext.js";
 export default async function Home() {
 
     return (
-      <main className="flex flex-col min-h-screen items-center justify-center">
-        <h1 className="text-4xl text-center">You are connected to MongoDB! LFG</h1>
-        <GlobalContextComponent>
-          <Search />
-          <Chart />
-        </GlobalContextComponent>
-      </main>
+      <div className="flex justify-center">
+        <div className="w-10/12">
+          <main className="w-full flex flex-col gap-10 min-h-screen items-center justify-center">
+            <GlobalContextComponent>
+              <Search />
+              <Chart />
+            </GlobalContextComponent>
+          </main>
+        </div>
+      </div>
     )
 }

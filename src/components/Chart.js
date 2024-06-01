@@ -6,13 +6,13 @@ import { GlobalContext } from '../app/GlobalContext';
 
 export default function Chart() {
     const { data, loading } = useContext(GlobalContext);
-
     const chartContainerRef = useRef();
 
     useEffect(() => {
         const chart = createChart(chartContainerRef.current, {
-            layout:  {
-                background: {type: ColorType.Solid, color: 'white'}
+            layout: {
+                textColor: 'black',
+                background: { type: 'solid', color: 'white' },
             },
             width: chartContainerRef.current.clientWidth,
             height: 300,
@@ -29,7 +29,7 @@ export default function Chart() {
         const newSeries = chart.addAreaSeries({
             lineColor: "#2962FF",
             topColor: "#2962FF",
-            bottomColor: "rgba(41, 98, 255, 0)",
+            bottomColor: "rgba(41, 98, 255, 0.28)",
         });
 
         newSeries.setData(data)
