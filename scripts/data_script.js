@@ -87,7 +87,7 @@ async function queryPrice(itemName) {
         
         // Fetch the item again
         response = await fetch(steamApiUrl + itemName + `?api_key=${apikey}` + `&median_history_days=10000`);
-    } else if (response.status != 200) {
+    } else if (response.status != 429 && response.status != 200) {
         // If the response is not 200, throw an error, ending the program
         // ERROR came here, maybe just make it wait, since it's an api response issue, not something with the item
         // waiting fixed the issue for postman, I could call the api in the same day again
