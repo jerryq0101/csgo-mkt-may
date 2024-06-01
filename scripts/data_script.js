@@ -211,7 +211,7 @@ function delay(ms) {
 // This script should be run once every week (Allowing for all items to be fetched in API rate limits, and prices to not be too behind)
 
 async function fetchData() {
-    const itemsStrings = Object.keys(specificData);
+    const itemsStrings = Object.keys(data);
 
     // Setup Mongo
     const { collection, client } = await setup();
