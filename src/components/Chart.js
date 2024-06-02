@@ -4,11 +4,31 @@ import React, { useEffect, useRef, useContext } from 'react';
 import { createChart, ColorType } from 'lightweight-charts';
 import { GlobalContext } from '../app/GlobalContext';
 
+function separatePriceVolumeSeries(data){
+    const priceData = [];
+    const volumeData = [];
+    
+    data.forEach(item => {
+        priceData.push({
+            time: item.time,
+            value: item.price,
+        });
+        volumeData.push({
+            time: item.time,
+            value: item.volume,
+            color: "#2962FF",
+        });
+    });
+    return { priceData, volumeData };
+}
+
 export default function Chart() {
     const { data, loading } = useContext(GlobalContext);
     const chartContainerRef = useRef();
 
     useEffect(() => {
+        const { priceData, volumeData } = separatePriceVolumeSeries(data);
+
         const chart = createChart(chartContainerRef.current, {
             layout: {
                 textColor: 'black',
@@ -17,7 +37,6 @@ export default function Chart() {
             width: chartContainerRef.current.clientWidth,
             height: 300,
         });
-        chart.timeScale().fitContent();
 
         // Function to handle resize
         function handleResize() {
@@ -32,7 +51,40 @@ export default function Chart() {
             bottomColor: "rgba(41, 98, 255, 0.28)",
         });
 
-        newSeries.setData(data)
+        newSeries.setData(priceData)
+
+        // Set Price scale margins
+        // Also adding volume histogram series
+
+        newSeries.priceScale().applyOptions({
+            scaleMargins: {
+                // positioning the price scale for the area series
+                top: 0.1,
+                bottom: 0.4,
+            },
+        });
+
+        const volumeSeries = chart.addHistogramSeries({
+            color: '#26a69a',
+            priceFormat: {
+                type: 'volume',
+            },
+            priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+            // set the positioning of the volume series
+            scaleMargins: {
+                top: 0.6, // highest point of the series will be 70% away from the top
+                bottom: 0,
+            },
+        });
+        volumeSeries.priceScale().applyOptions({
+            scaleMargins: {
+                top: 0.8, // highest point of the series will be 70% away from the top
+                bottom: 0,
+            },
+        });
+        volumeSeries.setData(volumeData);
+
+        chart.timeScale().fitContent();
 
         window.addEventListener('resize', handleResize);
 

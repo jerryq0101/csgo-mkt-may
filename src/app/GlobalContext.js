@@ -27,7 +27,8 @@ export function GlobalContextComponent({ children }) {
             }
             return {
                 time: `${year}-${month}-${day}`,
-                value: item.median_price
+                price: item.median_price,
+                volume: item.volume
             }
         })
 
@@ -47,22 +48,25 @@ export function GlobalContextComponent({ children }) {
                 .then(data => {
                     if (data.data) {
                         console.log(data)
+
+                        // Change getArrayFromResponseJson to also include volume in the returned data
+                        // So context data will need to be processed to separate price and volume in Chart.js
                         const processedData = getArrayFromResponseJson(data);
                         setData(processedData);
                     }
                 })
         } else {
             setData([
-                { time: '2018-12-22', value: 32.51 },
-                { time: '2018-12-23', value: 31.11 },
-                { time: '2018-12-24', value: 27.02 },
-                { time: '2018-12-25', value: 27.32 },
-                { time: '2018-12-26', value: 25.17 },
-                { time: '2018-12-27', value: 28.89 },
-                { time: '2018-12-28', value: 25.46 },
-                { time: '2018-12-29', value: 23.92 },
-                { time: '2018-12-30', value: 22.68 },
-                { time: '2018-12-31', value: 22.67 },
+                { time: '2018-12-22', price: 32.51, volume: 100 },
+                { time: '2018-12-23', price: 31.11, volume: 150 },
+                { time: '2018-12-24', price: 27.02, volume: 200 },
+                { time: '2018-12-25', price: 27.32, volume: 120 },
+                { time: '2018-12-26', price: 25.17, volume: 80 },
+                { time: '2018-12-27', price: 28.89, volume: 90 },
+                { time: '2018-12-28', price: 25.46, volume: 110 },
+                { time: '2018-12-29', price: 23.92, volume: 70 },
+                { time: '2018-12-30', price: 22.68, volume: 60 },
+                { time: '2018-12-31', price: 22.67, volume: 50 },
             ]);
         }
     }, [query]);

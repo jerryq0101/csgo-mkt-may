@@ -4,7 +4,6 @@ import Search from "@/components/Search.js";
 import { GlobalContextComponent } from "@/app/GlobalContext.js";
 
 export default async function Home() {
-
     return (
       <div className="flex justify-center py-10">
         <div className="w-10/12">
