@@ -184,7 +184,7 @@ export default function Search() {
                                             // Process the name such that its shorter
                                             const finalString = processItem(item);
                                             return (
-                                                <div className="bg-white px-[8px] py-[3px] select-none">
+                                                <div key={index} className="bg-white px-[8px] py-[3px] select-none">
                                                         <button 
                                                             key={index} 
                                                             autoFocus={index === 0}

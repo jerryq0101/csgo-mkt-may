@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
         const queryString = searchParams.get('query')
         const data = await collection.find({
             name: {
-                $regex: new RegExp(queryString, 'i') // 'i' makes it case insensitive
+                $regex: new RegExp(queryString || '', 'i') // 'i' makes it case insensitive
             }
         }).toArray();
         
