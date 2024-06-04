@@ -121,7 +121,7 @@ export default function Search() {
                 dragControls={controls}
                 dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
             >
-                <div className="bg-neutral-200 w-fit flex rounded-xl">
+                <div className="bg-neutral-200 w-[389px] flex rounded-xl">
                     <div className="h-[395px] w-[389px]">
                         <div className="h-[55px] flex flex-row items-center">
                             <div className="px-[13px] py-[15px]">
@@ -156,7 +156,7 @@ export default function Search() {
                             {
                                 !tooShort && searching 
                                     && 
-                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
+                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black select-none">
                                         Searching...
                                     </div>    
                             }
@@ -164,14 +164,14 @@ export default function Search() {
                             {
                                 search && suggestions.length == 0 && !searching && tooShort 
                                     && 
-                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
+                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black select-none">
                                         Too fuckin short 🖕
                                     </div>
                             }
                             {
                                 isFocused && search && suggestions.length == 0 && !searching && !tooShort 
                                     && 
-                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
+                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black select-none">
                                         No results found
                                     </div>
                             }

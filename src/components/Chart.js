@@ -123,7 +123,7 @@ export default function Chart() {
             </div>
 
             <div className="pl-[50px] pr-[33px] pb-[40px] text-black select-none">
-                <div ref={chartContainerRef} className="w-[800px]" style={{position: "relative"}}>
+                <div ref={chartContainerRef} className="w-[700px]" style={{position: "relative"}}>
                     {
                         query &&
                         <div style={{position: "absolute", top: 10, left: 20, zIndex: 20}}>
