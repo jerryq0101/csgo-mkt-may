@@ -13,7 +13,7 @@ export default async function Home() {
               <Search />
               <Chart />
             </GlobalContextComponent>
-            <TestStuff />
+            <TestStuff/>
           </main>
         </div>
       </div>
