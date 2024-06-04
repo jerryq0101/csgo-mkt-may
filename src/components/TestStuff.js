@@ -8,7 +8,6 @@ import SearchIcon from "./icons/search";
 import { motion, useDragControls } from 'framer-motion';
 
 export default function TestStuff() {
-    const reference = useRef(null);
     const [search, setSearch] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [searching, setSearching] = useState(false);
@@ -102,11 +101,11 @@ export default function TestStuff() {
 
     return (
         <>
-            <motion.div ref={reference} className="bg-zinc-700 w-[900px] h-[900px]" />
-            {/* <div className="drag-area bg-zinc-700 w-full h-[500px] flex flex-row justify-center"> */}
+            {/* <motion.div ref={reference} className="bg-zinc-700 w-[900px] h-[900px]" /> */}
+            <div className="drag-area bg-zinc-700 w-full h-[500px] flex flex-row justify-center">
                     <motion.div
                         drag
-                        dragConstraints={reference}
+                        dragConstraints={{top: 0, left: 0, right: 0, bottom: 0}}
                         dragListener={false}
                         dragControls={controls}
                         dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
@@ -122,7 +121,7 @@ export default function TestStuff() {
                                     </div>
                                 </div>
 
-                                {/* Inner column of shit */}
+                                {/* Inner column of stuff */}
                                 <div className="px-[50px]">
                                     {/* Search Bar */}
                                     <div className={`bg-white rounded-xl w-full px-[10px] py-[19px] mb-auto ${searchStyles} select-none text-black`}>
@@ -207,17 +206,7 @@ export default function TestStuff() {
                             </div>
                         </div>
                     </motion.div>
-
-                    <motion.div
-                        drag
-                        dragConstraints={reference}
-                    >
-                        <div className="bg-neutral-200 w-fit flex rounded-xl">
-                            <div className="h-[395px] w-[389px]">
-                            </div>
-                        </div>
-                    </motion.div>
-            {/* </div> */}
+            </div>
         </>
     );
 }

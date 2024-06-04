@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useContext } from 'react';
 import { createChart, ColorType } from 'lightweight-charts';
 import { GlobalContext } from '../app/GlobalContext';
+import Dots from "./icons/dots";
 
 function separatePriceVolumeSeries(data){
     const priceData = [];
@@ -32,7 +33,7 @@ export default function Chart() {
         const chart = createChart(chartContainerRef.current, {
             layout: {
                 textColor: 'black',
-                background: { type: 'solid', color: 'white' },
+                background: { type: 'solid', color: '#E5E5E5' },
             },
             width: chartContainerRef.current.clientWidth,
             height: 300,
@@ -95,6 +96,18 @@ export default function Chart() {
     }, [data, loading])
 
     return (
-        <div ref={chartContainerRef} className="w-full h-96" />
+        <div className="bg-neutral-200 w-fit flex flex-col rounded-xl   ">
+            <div className="h-[55px] w-full flex flex-row items-center">
+                        <div className="px-[13px] py-[15px]">
+                            <div className="cursor-pointer">
+                                {/* On drag here */}
+                                <Dots />
+                            </div>
+                        </div>
+            </div>
+            <div className="px-[50px] pb-[50px]">
+                <div ref={chartContainerRef} className="w-[800px]" />
+            </div>
+        </div>
     )
 }
