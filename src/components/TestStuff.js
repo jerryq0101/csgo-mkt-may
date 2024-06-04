@@ -1,38 +1,51 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Dots from './icons/dots';
 import SearchIcon from "./icons/search";
+import { GlobalContext } from '../app/GlobalContext';
 import { motion, useDragControls } from 'framer-motion';
 
-export default function TestStuff() {
+export default function Search() {
     const [search, setSearch] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [searching, setSearching] = useState(false);
     const [tooShort, setTooShort] = useState(false);
+    const { setQuery } = useContext(GlobalContext);
     
     useEffect(() => {
-        if (search.length >= 3) {
-            setTooShort(false);
-            setSearching(true);
-            fetch(`/api/suggestions/?query=${search}`)
-            .then(res => res.json())
-            .then(data => {
-                const dataArray = data.data
-                console.log(dataArray)
-                const namesArray = dataArray.map(item => item.name)
-                console.log(namesArray)
-                setSearching(false);
-                setSuggestions(namesArray)
-            })
-            
-        } else {
-            setSuggestions([]);
-            setTooShort(true);
-        }
+        debouncedSearch(search)
     }, [search])
+
+    const timeout = useRef();
+
+    function debouncedSearch(search, delay=1000) {
+        
+        clearTimeout(timeout.current);
+        timeout.current = setTimeout(() => {
+            console.log("Searching for: ", search);
+            if (search.length >= 3) {
+                setTooShort(false);
+                setSearching(true);
+                fetch(`/api/suggestions/?query=${search}`)
+                .then(res => res.json())
+                .then(data => {
+                    const dataArray = data.data
+                    console.log(dataArray)
+                    const namesArray = dataArray.map(item => item.name)
+                    console.log(namesArray)
+                    setSearching(false);
+                    setSuggestions(namesArray)
+                })
+                
+            } else {
+                setSuggestions([]);
+                setTooShort(true);
+            }
+        }, delay);
+    }
 
     const [searchStyles, setSearchStyles] = useState("");
 
@@ -101,112 +114,110 @@ export default function TestStuff() {
 
     return (
         <>
-            {/* <motion.div ref={reference} className="bg-zinc-700 w-[900px] h-[900px]" /> */}
-            <div className="drag-area bg-zinc-700 w-full h-[500px] flex flex-row justify-center">
-                    <motion.div
-                        drag
-                        dragConstraints={{top: 0, left: 0, right: 0, bottom: 0}}
-                        dragListener={false}
-                        dragControls={controls}
-                        dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
-                    >
-                        <div className="bg-neutral-200 w-fit flex rounded-xl">
-                            <div className="h-[395px] w-[389px]">
-                                <div className="h-[55px] flex flex-row items-center">
-                                    <div className="px-[13px] py-[15px]">
-                                        <div className="cursor-pointer" onPointerDown={startDrag}>
-                                            {/* On drag here */}
-                                            <Dots />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Inner column of stuff */}
-                                <div className="px-[50px]">
-                                    {/* Search Bar */}
-                                    <div className={`bg-white rounded-xl w-full px-[10px] py-[19px] mb-auto ${searchStyles} select-none text-black`}>
-                                        <TextField
-                                            ref={inputRef}
-                                            value={search}
-                                            onChange={handleSearchChange}
-                                            onFocus={handleFocus}
-                                            onBlur={handleExitFocus}
-                                            id="outlined-start-adornment"
-                                            placeholder="Search for an Item"
-                                            sx={{ m: 0 }}
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start">
-                                                    <SearchIcon />
-                                                </InputAdornment>,
-                                            }}
-                                        />
-                                    </div>
-
-                                    {
-                                        !tooShort && searching 
-                                            && 
-                                            <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
-                                                Searching...
-                                            </div>    
-                                    }
-
-                                    {
-                                        search && suggestions.length == 0 && !searching && tooShort 
-                                            && 
-                                            <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
-                                                Too fuckin short 🖕
-                                            </div>
-                                    }
-                                    {
-                                        isFocused && search && suggestions.length == 0 && !searching && !tooShort 
-                                            && 
-                                            <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
-                                                No results found
-                                            </div>
-                                    }
-
-                                    {
-                                        search && suggestions.length != 0 && !searching && 
-                                            <div className="w-full overflow-auto max-h-[217px] rounded-b-xl overscroll-none">
-                                            {
-                                                suggestions.map((item, index) => {
-                                                    // Process the name such that its shorter
-                                                    const finalString = processItem(item);
-                                                    return (
-                                                        <div className="bg-white px-[8px] py-[3px] select-none">
-                                                                <button 
-                                                                    key={index} 
-                                                                    autoFocus={index === 0}
-                                                                    className={`bg-white flex items-start w-full px-[19px] py-[16px] text-gray-700 hover:bg-gray-300 focus:bg-blue-300 focus:text-black rounded-md cursor-default outline-none`}
-                                                                    onKeyDown={(event) => {
-                                                                        if (event.key === 'ArrowDown') {
-                                                                            event.preventDefault();
-                                                                            const nextElement = event.target.parentNode.nextElementSibling;
-                                                                            nextElement && nextElement.firstChild.focus();
-                                                                        } else if (event.key === 'ArrowUp') {
-                                                                            event.preventDefault();
-                                                                            const previousElement = event.target.parentNode.previousElementSibling;
-                                                                            previousElement && previousElement.firstChild.focus();
-                                                                        }
-                                                                    }}
-                                                                    onClick={(event) => {
-                                                                        event.preventDefault();
-                                                                        console.log("Clicked on: ", finalString)
-                                                                    }}
-                                                                >
-                                                                    {finalString}
-                                                                </button>
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                            </div>
-                                    }
+            <motion.div
+                drag
+                dragConstraints={{top: 0, left: 0, right: 0, bottom: 0}}
+                dragListener={false}
+                dragControls={controls}
+                dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
+            >
+                <div className="bg-neutral-200 w-fit flex rounded-xl">
+                    <div className="h-[395px] w-[389px]">
+                        <div className="h-[55px] flex flex-row items-center">
+                            <div className="px-[13px] py-[15px]">
+                                <div className="cursor-pointer" onPointerDown={startDrag}>
+                                    {/* On drag here */}
+                                    <Dots />
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
-            </div>
+
+                        {/* Inner column of stuff */}
+                        <div className="px-[50px]">
+                            {/* Search Bar */}
+                            <div className={`bg-white rounded-xl w-full px-[10px] py-[19px] mb-auto ${searchStyles} select-none text-black`}>
+                                <TextField
+                                    ref={inputRef}
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                    onFocus={handleFocus}
+                                    onBlur={handleExitFocus}
+                                    id="outlined-start-adornment"
+                                    placeholder="Search for an Item"
+                                    sx={{ m: 0 }}
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>,
+                                    }}
+                                />
+                            </div>
+
+                            {
+                                !tooShort && searching 
+                                    && 
+                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
+                                        Searching...
+                                    </div>    
+                            }
+
+                            {
+                                search && suggestions.length == 0 && !searching && tooShort 
+                                    && 
+                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
+                                        Too fuckin short 🖕
+                                    </div>
+                            }
+                            {
+                                isFocused && search && suggestions.length == 0 && !searching && !tooShort 
+                                    && 
+                                    <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black">
+                                        No results found
+                                    </div>
+                            }
+
+                            {
+                                search && suggestions.length != 0 && !searching && 
+                                    <div className="w-full overflow-auto max-h-[217px] rounded-b-xl overscroll-none">
+                                    {
+                                        suggestions.map((item, index) => {
+                                            // Process the name such that its shorter
+                                            const finalString = processItem(item);
+                                            return (
+                                                <div className="bg-white px-[8px] py-[3px] select-none">
+                                                        <button 
+                                                            key={index} 
+                                                            autoFocus={index === 0}
+                                                            className={`bg-white flex items-start w-full px-[19px] py-[16px] text-gray-700 hover:bg-gray-300 focus:bg-blue-300 focus:text-black rounded-md cursor-default outline-none`}
+                                                            onKeyDown={(event) => {
+                                                                if (event.key === 'ArrowDown') {
+                                                                    event.preventDefault();
+                                                                    const nextElement = event.target.parentNode.nextElementSibling;
+                                                                    nextElement && nextElement.firstChild.focus();
+                                                                } else if (event.key === 'ArrowUp') {
+                                                                    event.preventDefault();
+                                                                    const previousElement = event.target.parentNode.previousElementSibling;
+                                                                    previousElement && previousElement.firstChild.focus();
+                                                                }
+                                                            }}
+                                                            onClick={(event) => {
+                                                                event.preventDefault();
+                                                                console.log("Clicked on: ", finalString)
+                                                                setQuery(item);
+                                                            }}
+                                                        >
+                                                            {finalString}
+                                                        </button>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                    </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
         </>
     );
 }

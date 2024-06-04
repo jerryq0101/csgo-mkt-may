@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { createChart, ColorType } from 'lightweight-charts';
 import { GlobalContext } from '../app/GlobalContext';
 import Dots from "./icons/dots";
@@ -25,6 +25,10 @@ function separatePriceVolumeSeries(data){
 
 export default function Chart() {
     const { data, loading } = useContext(GlobalContext);
+    const { query } = useContext(GlobalContext);
+    const [crossHairPrice, setCrossHairPrice] = useState(null);
+    const [crossHairVolume, setCrossHairVolume] = useState(null);
+    const [crossHairTime, setCrossHairTime] = useState(null);
     const chartContainerRef = useRef();
 
     useEffect(() => {
@@ -60,8 +64,8 @@ export default function Chart() {
         newSeries.priceScale().applyOptions({
             scaleMargins: {
                 // positioning the price scale for the area series
-                top: 0.1,
-                bottom: 0.4,
+                top: 0.4,
+                bottom: 0.15,
             },
         });
 
@@ -89,6 +93,18 @@ export default function Chart() {
 
         window.addEventListener('resize', handleResize);
 
+        chart.subscribeCrosshairMove((param) => {
+            console.log(param)
+            if (param.time && param.seriesData) {
+                const price = param.seriesData.get(newSeries).value;
+                const volume = param.seriesData.get(volumeSeries).value;
+                setCrossHairPrice(price);
+                setCrossHairVolume(volume);
+                setCrossHairTime(param.time);
+                console.log(price, volume)
+            }
+        });
+        
         return () => {
             window.removeEventListener('resize', handleResize);
             chart.remove();
@@ -96,7 +112,7 @@ export default function Chart() {
     }, [data, loading])
 
     return (
-        <div className="bg-neutral-200 w-fit flex flex-col rounded-xl   ">
+        <div className="bg-neutral-200 w-fit flex flex-col rounded-xl z-0">
             <div className="h-[55px] w-full flex flex-row items-center">
                         <div className="px-[13px] py-[15px]">
                             <div className="cursor-pointer">
@@ -105,8 +121,19 @@ export default function Chart() {
                             </div>
                         </div>
             </div>
-            <div className="px-[50px] pb-[50px]">
-                <div ref={chartContainerRef} className="w-[800px]" />
+
+            <div className="pl-[50px] pr-[33px] pb-[40px] text-black select-none">
+                <div ref={chartContainerRef} className="w-[800px]" style={{position: "relative"}}>
+                    {
+                        query &&
+                        <div style={{position: "absolute", top: 10, left: 20, zIndex: 20}}>
+                            {query} <br />
+                            Time: {crossHairTime} <br />
+                            Price: {crossHairPrice ? crossHairPrice.toFixed(2): ""} {`\n`}<br />
+                            Volume: {crossHairVolume}
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     )
