@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Chart from "@/components/Chart.js";
-import Search from "@/components/TestStuff.js";
+import Search from "@/components/ActualSearch";
 import { GlobalContextComponent } from "@/app/GlobalContext.js";
 
 export default async function Home() {
