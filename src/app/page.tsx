@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Chart from "@/components/Chart.js";
 import Search from "@/components/Search.js";
+import TestStuff from "@/components/TestStuff.js";
 import { GlobalContextComponent } from "@/app/GlobalContext.js";
 
 export default async function Home() {
@@ -12,6 +13,7 @@ export default async function Home() {
               <Search />
               <Chart />
             </GlobalContextComponent>
+            <TestStuff />
           </main>
         </div>
       </div>
