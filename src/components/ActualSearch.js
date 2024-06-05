@@ -168,14 +168,14 @@ export default function Search() {
                                 search && suggestions.length == 0 && !searching && tooShort 
                                     && 
                                     <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black select-none">
-                                        Too fuckin short 🖕
+                                        Too short bro
                                     </div>
                             }
                             {
                                 isFocused && search && suggestions.length == 0 && !searching && !tooShort 
                                     && 
                                     <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black select-none">
-                                        No results found
+                                        No results found (Be more specific)
                                     </div>
                             }
 
