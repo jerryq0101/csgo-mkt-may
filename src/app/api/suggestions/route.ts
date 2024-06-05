@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
                 $regex: new RegExp(queryString || '', 'i') // 'i' makes it case insensitive
             }
         }).toArray();
+
+        console.log('data', data);
         
         return Response.json({
             isSuccessful: true,
