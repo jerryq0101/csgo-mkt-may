@@ -14,7 +14,7 @@ export default async function Home() {
                     <Chart />
                   </div>
                   <p className="text-zinc-400">
-                    CSGO is cool <br/>
+                    CSGO is cool. <br/>
                     Thanks <a className="no-underline" href="https://www.tradingview.com/">TradingView</a>. <br />
                     (jerryq0101)
                   </p>
