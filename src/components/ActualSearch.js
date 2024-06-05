@@ -161,7 +161,7 @@ export default function Search() {
                                     && 
                                     <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black select-none">
                                         Searching...
-                                    </div>    
+                                    </div>
                             }
 
                             {
@@ -172,7 +172,7 @@ export default function Search() {
                                     </div>
                             }
                             {
-                                isFocused && search && suggestions.length == 0 && !searching && !tooShort 
+                                search && suggestions.length == 0 && !searching && !tooShort 
                                     && 
                                     <div className="bg-white rounded-b-xl w-full px-[27px] py-[19px] text-black select-none">
                                         No results found (Be more specific)
