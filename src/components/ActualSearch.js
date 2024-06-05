@@ -146,7 +146,7 @@ export default function Search() {
                                     onFocus={handleFocus}
                                     onBlur={handleExitFocus}
                                     id="outlined-start-adornment"
-                                    placeholder="Search for an Item"
+                                    placeholder="Search for CS Item"
                                     sx={{ m: 0 }}
                                     InputProps={{
                                         startAdornment: <InputAdornment position="start">
