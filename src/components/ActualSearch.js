@@ -22,23 +22,26 @@ export default function Search() {
     const timeout = useRef();
 
     function debouncedSearch(search, delay=1000) {
-        
         clearTimeout(timeout.current);
-        timeout.current = setTimeout(() => {
-            console.log("Searching for: ", search);
+        timeout.current = setTimeout(async () => {
+            // console.log("Searching for: ", search);
             if (search.length >= 3) {
                 setTooShort(false);
                 setSearching(true);
-                fetch(`/api/suggestions/?query=${search}`)
-                .then(res => res.json())
-                .then(data => {
-                    const dataArray = data.data
-                    console.log(dataArray)
-                    const namesArray = dataArray.map(item => item.name)
-                    console.log(namesArray)
+                try {
+                    const res = await fetch(`/api/suggestions/?query=${search}`);
+                    const data = await res.json();
+                    const dataArray = data.data;
+                    // console.log(dataArray);
+                    const namesArray = await dataArray.map(item => item.name);
+                    // console.log(namesArray);
                     setSearching(false);
-                    setSuggestions(namesArray)
-                })
+                    setSuggestions(namesArray);
+                } catch (error) {
+                    console.error(error);
+                    setSearching(false);
+                    setSuggestions([]);
+                }
                 
             } else {
                 setSuggestions([]);
@@ -102,7 +105,7 @@ export default function Search() {
 
     function startDrag(event) {
         controls.start(event)
-        console.log("Started")
+        // console.log("Started")
     }
       
     /*
@@ -202,7 +205,7 @@ export default function Search() {
                                                             }}
                                                             onClick={(event) => {
                                                                 event.preventDefault();
-                                                                console.log("Clicked on: ", finalString)
+                                                                // console.log("Clicked on: ", finalString)
                                                                 setQuery(item);
                                                             }}
                                                         >

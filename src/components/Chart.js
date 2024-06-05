@@ -94,14 +94,12 @@ export default function Chart() {
         window.addEventListener('resize', handleResize);
 
         chart.subscribeCrosshairMove((param) => {
-            console.log(param)
             if (param.time && param.seriesData) {
                 const price = param.seriesData.get(newSeries).value;
                 const volume = param.seriesData.get(volumeSeries).value;
                 setCrossHairPrice(price);
                 setCrossHairVolume(volume);
                 setCrossHairTime(param.time);
-                console.log(price, volume)
             }
         });
         
@@ -123,7 +121,7 @@ export default function Chart() {
             </div>
 
             <div className="pl-[50px] pr-[33px] pb-[40px] text-black select-none">
-                <div ref={chartContainerRef} className="w-[700px]" style={{position: "relative"}}>
+                <div ref={chartContainerRef} className="md:w-[700px] sm:w-[500px] h-[300px]" style={{position: "relative"}}>
                     {
                         query &&
                         <div style={{position: "absolute", top: 10, left: 20, zIndex: 20}}>

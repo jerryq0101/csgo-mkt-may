@@ -9,7 +9,7 @@ export function GlobalContextComponent({ children }) {
     const [loading, setLoading] = useState(true);
 
     function getArrayFromResponseJson(rawData) {
-        console.log(rawData.data.price_history)
+        // console.log(rawData.data.price_history)
         const array = rawData.data.price_history;
         
         // Filter out the volume data for now
@@ -39,22 +39,17 @@ export function GlobalContextComponent({ children }) {
         // Fetch some bullshit data from api, set loading is true, 
         // and set data, then set loading to be false
         if (query) {
-            setLoading(true);
-            console.log("Query Item Text from Global Context: ", query)
-            const name = encodeURIComponent(query);
-            
-            fetch(`/api?name=${name}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.data) {
-                        console.log(data)
-
-                        // Change getArrayFromResponseJson to also include volume in the returned data
-                        // So context data will need to be processed to separate price and volume in Chart.js
-                        const processedData = getArrayFromResponseJson(data);
-                        setData(processedData);
-                    }
-                })
+            async function processQuery() {
+                setLoading(true);
+                // console.log("Query Item Text from Global Context: ", query)
+                const name = encodeURIComponent(query);
+                
+                const response = await fetch(`/api?name=${name}`)
+                const responseJson = await response.json()
+                const processedData = await getArrayFromResponseJson(responseJson);
+                setData(processedData);
+            }
+            processQuery();
         } else {
             setData([
                 { time: '2018-12-22', price: 32.51, volume: 100 },
