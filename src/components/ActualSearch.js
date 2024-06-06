@@ -107,7 +107,7 @@ export default function Search() {
         controls.start(event)
         // console.log("Started")
     }
-      
+
     /*
         Alternatively, it can accept a ref to another component created with 
         React's useRef hook. This ref should be passed both to the draggable 
