@@ -110,7 +110,7 @@ export default function Chart() {
     }, [data, loading])
 
     return (
-        <div className="bg-neutral-200 w-fit flex flex-col rounded-xl z-0">
+        <div className="bg-neutral-200 2xl:max-w-[800px] xl:max-w-[700px] md:max-w-[400px] flex flex-col rounded-xl">
             <div className="h-[55px] w-full flex flex-row items-center">
                         <div className="px-[13px] py-[15px]">
                             <div className="cursor-pointer">
@@ -120,8 +120,8 @@ export default function Chart() {
                         </div>
             </div>
 
-            <div className="pl-[50px] pr-[33px] pb-[40px] text-black select-none">
-                <div ref={chartContainerRef} className="md:w-[700px] sm:w-[500px] h-[300px]" style={{position: "relative"}}>
+            <div className="px-[50px] pb-[40px] text-black select-none">
+                <div ref={chartContainerRef} className="2xl:w-[700px] xl:w-[600px] md:w-[300px] sm:w-[200px] w-[50px] h-[300px]" style={{position: "relative"}}>
                     {
                         query &&
                         <div style={{position: "absolute", top: 10, left: 20, zIndex: 20}}>

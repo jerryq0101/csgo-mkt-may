@@ -124,8 +124,8 @@ export default function Search() {
                 dragControls={controls}
                 dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
             >
-                <div className="bg-neutral-200 w-[389px] flex rounded-xl">
-                    <div className="h-[395px] w-[389px]">
+                <div className="bg-neutral-200 xl:max-w-[389px] w-fit flex rounded-xl">
+                    <div className="h-[395px] md:w-[389px] w-fit">
                         <div className="h-[55px] flex flex-row items-center">
                             <div className="px-[13px] py-[15px]">
                                 <div className="cursor-pointer" onPointerDown={startDrag}>
