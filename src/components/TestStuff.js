@@ -1,20 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState} from "react";
 import GridLayout, {Responsive, WidthProvider} from "react-grid-layout";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export default function TestStuff() {
-    const layout1 = {}
-
+    const layouts = {}
+    
     return (
         <>
             <ResponsiveGridLayout
                 className="layout bg-red-300"
                 cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
                 rowHeight={30}
-                layouts={layout1}
+                layouts={layouts}
             >
                 <div className="bg-green-300"key="1" data-grid={{ w: 2, h: 3, x: 0, y: 0, minW: 2, minH: 3 }}>
                     <span className="text">1</span>
