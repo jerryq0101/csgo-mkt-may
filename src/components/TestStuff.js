@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {Responsive, WidthProvider} from "react-grid-layout";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -8,9 +8,11 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 export default function TestStuff() {
     const [layouts, setLayouts] = useState({});
 
-    // Initial Layout Setup
     // If localStorage exists, get it, if not, set it to default object
+    // (Called Second)
     useEffect(() => {
+        console.log("first useeffect called")
+        console.log("layout state", layouts)
         const layout = JSON.parse(localStorage.getItem("layout"));
         if (layout) {
             setLayouts(layout);
@@ -19,13 +21,24 @@ export default function TestStuff() {
         }
     }, [])
 
-    // Update Layout for state and localStorage
+    // Update Layout for state and localStorage 
+    // (Called First)
     const updateL = (layout, layouts) => {
+        console.log("UpdateL called");
+        console.log("Layout State", layouts)
         setLayouts(layouts);
         console.log("Layout", layout);
         console.log("Layouts", layouts);
-        localStorage.setItem("layout", JSON.stringify(layouts));
     }
+
+    // (Called Third, 1st render)
+    useEffect(() => {
+        console.log("Second useeffect called")
+        console.log("Layout State", layouts)
+        if (Object.keys(layouts).length > 0) {
+            localStorage.setItem("layout", JSON.stringify(layouts));
+        }
+    }, [layouts])
 
     /*
     Documentation for any grid Item
@@ -99,16 +112,6 @@ export default function TestStuff() {
         // ]
     }
 
-
-    // Steps
-    // Use a default object to setup if localStorage is empty
-        // If localStorage not empty, use localStorage object, add to it maybe
-        // If it is empty, use {}
-    // Make updateLS(layout, layouts) function (Needs to update+/add the breakpoint : layout)
-        // also updates the state here to update stuff live
-
-
-
     return (
         <>
         {/* // {name: pxVal}, e.g. {lg: 1200, md: 996, sm: 768, xs: 480}
@@ -154,8 +157,6 @@ export default function TestStuff() {
                 <div className="bg-green-300"key="5" >
                     <span className="text">5</span>
                 </div>
-
-                
             </ResponsiveGridLayout>
             
         </>
