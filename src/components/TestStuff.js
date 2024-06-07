@@ -9,6 +9,7 @@ import Dots from "./icons/dots";
 import SearchIcon from "./icons/search";
 import DragComponent from "./sub-components/DragComponent";
 import SearchComponent from "./sub-components/SearchComponent";
+import ChartComponent from "./sub-components/ChartComponent";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -203,9 +204,11 @@ export default function TestStuff() {
                 </div>
 
                 <div className="bg-neutral-200 flex flex-col rounded-xl"key="2" >
-                    <span className="text">2</span>
                     <DragComponent />
-                    
+                    <div className="pt-5">
+                        <ChartComponent />
+                    </div>
+                    <span className="text">2</span>
                 </div>
                 {/* <div className="bg-green-300"key="3" >
                     <span className="text">3</span>
