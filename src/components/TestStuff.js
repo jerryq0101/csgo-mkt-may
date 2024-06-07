@@ -2,11 +2,24 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import {Responsive, WidthProvider} from "react-grid-layout";
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import TestSearch from "./TestSearch";
+import Dots from "./icons/dots";
+import SearchIcon from "./icons/search";
+import DragComponent from "./sub-components/DragComponent";
+import SearchComponent from "./sub-components/SearchComponent";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export default function TestStuff() {
     const [layouts, setLayouts] = useState({});
+    const [search, setSearch] = useState("");
+
+    // FOR SEARCH COMPONENT! NOT FOR GRID
+    const [isFocused, setIsFocused] = useState(false);
+    const [searchStyles, setSearchStyles] = useState("");
+    // BACK
 
     // If localStorage exists, get it, if not, set it to default object
     // (Called Second)
@@ -34,6 +47,23 @@ export default function TestStuff() {
     const updateL = (layout, layouts) => {
         console.log("UpdateL called");
         setLayouts(layouts);
+    }
+
+    // FOR SEARCH COMPONENT! NOT FOR GRID
+    useEffect(() => {
+        if (!search) {
+            setSearchStyles("rounded-xl");
+        } else {
+            setSearchStyles("rounded-t-xl rounded-b-none");
+        }
+    }, [search, isFocused])
+
+    const handleFocus = () => {
+        setIsFocused(true);
+    }
+
+    const handleExitFocus = () => {
+        setIsFocused(false);
     }
 
     /*
@@ -98,36 +128,31 @@ export default function TestStuff() {
     // // Search = 2 col version
     const defaultLayout = {
         "xxl": [
-            { i: "1", w: 2, h: 3, x: 0, y: 0, minW: 2, minH: 3 },
-            { i: "2", w: 4, h: 3, x: 3, y: 0, minW: 3, minH: 3 },
-            { i: "3", w: 1, h: 3, x: 5, y: 0, minW: 1, minH: 3 },
+            { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
+            { i: "2", w: 4, h: 1, x: 3, y: 0, minW: 3, minH: 1 },
+            { i: "3", w: 1, h: 1, x: 5, y: 0, minW: 1, minH: 1 },
         ],
         "xl": [
-            { i: "1", w: 2, h: 3, x: 0, y: 0, minW: 2, minH: 3 },
-            { i: "2", w: 3, h: 3, x: 3, y: 0, minW: 3, minH: 3 },
-            { i: "3", w: 1, h: 3, x: 5, y: 0, minW: 1, minH: 3 },
+            { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
+            { i: "2", w: 3, h: 1, x: 3, y: 0, minW: 3, minH: 1 },
+            { i: "3", w: 1, h: 1, x: 5, y: 0, minW: 1, minH: 1 },
         ],
         "lg": [
-            { i: "1", w: 2, h: 3, x: 0, y: 0, minW: 2, minH: 3 },
-            { i: "2", w: 3, h: 3, x: 3, y: 0, minW: 3, minH: 3 },
-            { i: "3", w: 2, h: 3, x: 5, y: 0, minW: 2, minH: 3 },
+            { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
+            { i: "2", w: 3, h: 1, x: 3, y: 0, minW: 3, minH: 1 },
+            { i: "3", w: 2, h: 1, x: 5, y: 0, minW: 2, minH: 1 },
         ],
         "md": [
-            { i: "1", w: 2, h: 3, x: 0, y: 0, minW: 2, minH: 3 },
-            { i: "2", w: 2, h: 3, x: 3, y: 0, minW: 2, minH: 3 },
-            { i: "3", w: 2, h: 3, x: 5, y: 0, minW: 2, minH: 3 },
+            { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
+            { i: "2", w: 2, h: 1, x: 3, y: 0, minW: 2, minH: 1 },
+            { i: "3", w: 2, h: 1, x: 5, y: 0, minW: 2, minH: 1 },
         ],
         "sm": [
-            { i: "1", w: 2, h: 3, x: 0, y: 0, minW: 2, minH: 3 },
-            { i: "2", w: 2, h: 3, x: 3, y: 0, minW: 2, minH: 3 },
-            { i: "3", w: 1, h: 2, x: 5, y: 0, minW: 1, minH: 3 },
+            { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
+            { i: "2", w: 2, h: 1, x: 3, y: 0, minW: 2, minH: 1 },
+            { i: "3", w: 1, h: 1, x: 5, y: 0, minW: 1, minH: 1 },
         ],
     }
-
-    // Steps:
-    // Change breakpoints to tailwind ones DONE
-    // Change cols to my own DONE
-    // change default layout to have minW, width and height (maybe coordinates that work)
 
     return (
         <>
@@ -158,28 +183,35 @@ export default function TestStuff() {
                 // // search = 1 col Version
                 // cols={{ xxl: 3, xl: 2, lg: 2, md: 1, sm: 1 }}
                 // search = 2 col version
-                cols={{ xxl: 6, xl: 5, lg: 5, md: 2, sm: 2 }}
-                rowHeight={50}
+                cols={{ xxl: 7, xl: 6, lg: 5, md: 2, sm: 2 }}
+                rowHeight={500}
                 margin={[10, 10]}
+                containerPadding={[15, 15]}
                 layouts={layouts}
                 onLayoutChange={updateL}
                 draggableHandle=".draggable-handle"
             >
-                <div className="bg-green-300 flex"key="1" >
+                <div className="bg-neutral-200 flex flex-col rounded-xl" key="1" >
+                    
+                    {/* Dots top section */}
+                    <DragComponent />
+
+                    {/* Search bar ITSELF */}
+                    <SearchComponent />
+                    
                     <span className="text">1</span>
-                    <span className="draggable-handle">
-                        <hr />
-                        [DRAG HERE!]
-                        <hr />
-                    </span>
                 </div>
-                <div className="bg-green-300"key="2" >
+
+                <div className="bg-neutral-200 flex flex-col rounded-xl"key="2" >
                     <span className="text">2</span>
+                    <DragComponent />
+                    
                 </div>
                 {/* <div className="bg-green-300"key="3" >
                     <span className="text">3</span>
                 </div> */}
             </ResponsiveGridLayout>
+            
             
         </>
     )
