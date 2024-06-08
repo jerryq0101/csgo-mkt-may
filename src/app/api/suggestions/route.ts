@@ -6,9 +6,19 @@ import MongoDbConnection from "../../lib/dbconnection";
 export async function GET(request: NextRequest) {
     try {
         const client = await MongoDbConnection.getInstance();
-        const db = client.getDb();
-        const collection = db.collection('properties');
+        if (!client) {
+            throw Error("Database connection failed")
+        }
 
+        const db = await client.getDb();
+        if (!db) {
+            throw Error("Database connection failed")
+        }
+
+        const collection = await db.collection('properties');
+        if (!collection) {
+            throw Error("Collection not found")
+        }
         const searchParams = request.nextUrl.searchParams;
         const queryString = searchParams.get('query')
         const data = await collection.find({
