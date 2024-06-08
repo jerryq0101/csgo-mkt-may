@@ -28,8 +28,7 @@ export default function Chart() {
     const [crossHairPrice, setCrossHairPrice] = useState(null);
     const [crossHairVolume, setCrossHairVolume] = useState(null);
     const [crossHairTime, setCrossHairTime] = useState(null);
-    const chartContainerRef = useRef();
-
+    const chartContainerRef = useRef(null);
 
     useEffect(() => {
         const { priceData, volumeData } = separatePriceVolumeSeries(data);
@@ -53,7 +52,6 @@ export default function Chart() {
             });
             chart.timeScale().fitContent();
         }
-
         const resizeObserver = new ResizeObserver(handleResize);
         resizeObserver.observe(chartContainerRef.current);
 

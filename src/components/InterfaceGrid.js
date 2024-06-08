@@ -2,25 +2,14 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import {Responsive, WidthProvider} from "react-grid-layout";
-import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
-import TestSearch from "./TestSearch";
-import Dots from "./icons/dots";
-import SearchIcon from "./icons/search";
 import DragComponent from "./sub-components/DragComponent";
 import SearchComponent from "./sub-components/SearchComponent";
 import ChartComponent from "./sub-components/ChartComponent";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-export default function TestStuff() {
+export default function InterfaceGrid() {
     const [layouts, setLayouts] = useState({});
-    const [search, setSearch] = useState("");
-
-    // FOR SEARCH COMPONENT! NOT FOR GRID
-    const [isFocused, setIsFocused] = useState(false);
-    const [searchStyles, setSearchStyles] = useState("");
-    // BACK
 
     // If localStorage exists, get it, if not, set it to default object
     // (Called Second)
@@ -50,23 +39,6 @@ export default function TestStuff() {
         setLayouts(layouts);
     }
 
-    // FOR SEARCH COMPONENT! NOT FOR GRID
-    useEffect(() => {
-        if (!search) {
-            setSearchStyles("rounded-xl");
-        } else {
-            setSearchStyles("rounded-t-xl rounded-b-none");
-        }
-    }, [search, isFocused])
-
-    const handleFocus = () => {
-        setIsFocused(true);
-    }
-
-    const handleExitFocus = () => {
-        setIsFocused(false);
-    }
-
     /*
     Documentation for any grid Item
     {
@@ -94,37 +66,9 @@ export default function TestStuff() {
         resizeHandles?: ?Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'> = ['se']
         // If true and draggable, item will be moved only within grid.
         isBounded: ?boolean = false
-        }
+    }
     */
     
-    // // Search = 1 col version
-    // const defaultLayout = {
-    //     "xxl": [
-    //         { i: "1", w: 1, h: 3, x: 0, y: 0, minW: 1, minH: 3 },
-    //         { i: "2", w: 2, h: 3, x: 3, y: 0, minW: 2, minH: 3 },
-    //         { i: "3", w: 1, h: 3, x: 5, y: 0, minW: 1, minH: 3 },
-    //     ],
-    //     "xl": [
-    //         { i: "1", w: 1, h: 3, x: 0, y: 0, minW: 1, minH: 3 },
-    //         { i: "2", w: 1, h: 3, x: 3, y: 0, minW: 1, minH: 3 },
-    //         { i: "3", w: 1, h: 3, x: 5, y: 0, minW: 1, minH: 3 },
-    //     ],
-    //     "lg": [
-    //         { i: "1", w: 1, h: 3, x: 0, y: 0, minW: 1, minH: 3 },
-    //         { i: "2", w: 1, h: 3, x: 3, y: 0, minW: 1, minH: 3 },
-    //         { i: "3", w: 2, h: 3, x: 5, y: 0, minW: 2, minH: 3 },
-    //     ],
-    //     "md": [
-    //         { i: "1", w: 1, h: 3, x: 0, y: 0, minW: 1, minH: 2 },
-    //         { i: "2", w: 1, h: 3, x: 3, y: 0, minW: 2, minH: 2 },
-    //         { i: "3", w: 2, h: 3, x: 5, y: 0, minW: 2, minH: 2 },
-    //     ],
-    //     "sm": [
-    //         { i: "1", w: 1, h: 3, x: 0, y: 0, minW: 1, minH: 2 },
-    //         { i: "2", w: 1, h: 3, x: 3, y: 0, minW: 1, minH: 2 },
-    //         { i: "3", w: 1, h: 2, x: 5, y: 0, minW: 1, minH: 2 },
-    //     ],
-    // }
 
     // // Search = 2 col version
     const defaultLayout = {
@@ -164,14 +108,11 @@ export default function TestStuff() {
             // # of cols. This is a breakpoint -> cols map, e.g. {lg: 12, md: 10, ...}
             cols: ?Object = {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
 
-
             // margin (in pixels). Can be specified either as horizontal and vertical margin, e.g. `[10, 10]` or as a breakpoint -> margin map, e.g. `{lg: [10, 10], md: [10, 10], ...}.
             margin: [number, number] | {[breakpoint: $Keys<breakpoints>]: [number, number]},
 
-
             // containerPadding (in pixels). Can be specified either as horizontal and vertical padding, e.g. `[10, 10]` or as a breakpoint -> containerPadding map, e.g. `{lg: [10, 10], md: [10, 10], ...}.
             containerPadding: [number, number] | {[breakpoint: $Keys<breakpoints>]: [number, number]},
-
 
             // layouts is an object mapping breakpoints to layouts.
             // e.g. {lg: Layout, md: Layout, ...}
@@ -179,10 +120,8 @@ export default function TestStuff() {
         */}
 
             <ResponsiveGridLayout
-                className="layout bg-red-300 select-none"
+                className="layout border-2 border-sky-300 border-opacity-2 select-none"
                 breakpoints={{xxl: 1536, xl: 1280, lg: 1024, md: 768, sm: 480}}
-                // // search = 1 col Version
-                // cols={{ xxl: 3, xl: 2, lg: 2, md: 1, sm: 1 }}
                 // search = 2 col version
                 cols={{ xxl: 7, xl: 6, lg: 5, md: 2, sm: 2 }}
                 rowHeight={500}
@@ -192,30 +131,24 @@ export default function TestStuff() {
                 onLayoutChange={updateL}
                 draggableHandle=".draggable-handle"
             >
+                {/* 1st grid item */}
                 <div className="bg-neutral-200 flex flex-col rounded-xl" key="1" >
-                    
                     {/* Dots top section */}
                     <DragComponent />
-
                     {/* Search bar ITSELF */}
                     <SearchComponent />
-                    
-                    <span className="text">1</span>
+                    {/* <span className="text">1</span> */}
                 </div>
-
+                
+                {/* 2nd grid item */}
                 <div className="bg-neutral-200 flex flex-col rounded-xl"key="2" >
                     <DragComponent />
                     <div className="pt-5">
                         <ChartComponent />
                     </div>
-                    <span className="text">2</span>
+                    {/* <span className="text">2</span> */}
                 </div>
-                {/* <div className="bg-green-300"key="3" >
-                    <span className="text">3</span>
-                </div> */}
             </ResponsiveGridLayout>
-            
-            
         </>
     )
 }
