@@ -15,7 +15,7 @@ export default async function Home() {
               <p className="text-zinc-400">
                 CSGO-Prices Dashboard <br/>
                 Thanks <a className="no-underline" href="https://www.tradingview.com/">TradingView</a><br/>
-                (Made with 🖕 by jerryq0101)
+                (Made with 🐐 by jerryq0101)
               </p>
             </div>
             
