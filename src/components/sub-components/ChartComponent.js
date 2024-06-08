@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { createChart, ColorType } from 'lightweight-charts';
-import { GlobalContext } from '../app/GlobalContext';
-import Dots from "./icons/dots";
+import { GlobalContext } from '../../app/GlobalContext';
 
 function separatePriceVolumeSeries(data){
     const priceData = [];
@@ -29,7 +28,7 @@ export default function Chart() {
     const [crossHairPrice, setCrossHairPrice] = useState(null);
     const [crossHairVolume, setCrossHairVolume] = useState(null);
     const [crossHairTime, setCrossHairTime] = useState(null);
-    const chartContainerRef = useRef();
+    const chartContainerRef = useRef(null);
 
     useEffect(() => {
         const { priceData, volumeData } = separatePriceVolumeSeries(data);
@@ -43,12 +42,18 @@ export default function Chart() {
             height: 300,
         });
 
+        console.log(chartContainerRef.current.clientWidth);
+
+
         // Function to handle resize
         function handleResize() {
             chart.applyOptions({
                 width: chartContainerRef.current.clientWidth,
             });
+            chart.timeScale().fitContent();
         }
+        const resizeObserver = new ResizeObserver(handleResize);
+        resizeObserver.observe(chartContainerRef.current);
 
         const newSeries = chart.addAreaSeries({
             lineColor: "#2962FF",
@@ -91,8 +96,6 @@ export default function Chart() {
 
         chart.timeScale().fitContent();
 
-        window.addEventListener('resize', handleResize);
-
         chart.subscribeCrosshairMove((param) => {
             if (param.time && param.seriesData) {
                 const price = param.seriesData.get(newSeries).value;
@@ -104,24 +107,15 @@ export default function Chart() {
         });
         
         return () => {
-            window.removeEventListener('resize', handleResize);
+            resizeObserver.unobserve(chartContainerRef.current);
             chart.remove();
         }
     }, [data, loading])
 
     return (
-        <div className="bg-neutral-200 w-fit flex flex-col rounded-xl z-0">
-            <div className="h-[55px] w-full flex flex-row items-center">
-                        <div className="px-[13px] py-[15px]">
-                            <div className="cursor-pointer">
-                                {/* On drag here */}
-                                <Dots />
-                            </div>
-                        </div>
-            </div>
-
-            <div className="pl-[50px] pr-[33px] pb-[40px] text-black select-none">
-                <div ref={chartContainerRef} className="md:w-[700px] sm:w-[500px] h-[300px]" style={{position: "relative"}}>
+        <div className="bg-neutral-200 flex flex-col rounded-xl py-5">
+            <div className="px-[50px] pb-[40px] w-full text-black select-none">
+                <div ref={chartContainerRef} className="w-full h-[300px]" style={{position: "relative"}}>
                     {
                         query &&
                         <div style={{position: "absolute", top: 10, left: 20, zIndex: 20}}>
