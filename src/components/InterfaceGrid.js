@@ -120,7 +120,7 @@ export default function InterfaceGrid() {
         */}
 
             <ResponsiveGridLayout
-                className="layout border-2 border-sky-300 border-opacity-2 select-none"
+                className="layout border-2 border-sky-100 border-opacity-25 border-dotted select-none"
                 breakpoints={{xxl: 1536, xl: 1280, lg: 1024, md: 768, sm: 480}}
                 // search = 2 col version
                 cols={{ xxl: 7, xl: 6, lg: 5, md: 2, sm: 2 }}
