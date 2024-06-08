@@ -6,6 +6,7 @@ import TextField from '@mui/material/TextField';
 import SearchIcon from "../icons/search";
 import { GlobalContext } from '../../app/GlobalContext';
 import { motion, useDragControls } from 'framer-motion';
+import { getSuggestions } from "../../app/Suggestions"
 
 export default function SearchComponent() {
     const [search, setSearch] = useState("");
@@ -28,12 +29,14 @@ export default function SearchComponent() {
                 setTooShort(false);
                 setSearching(true);
                 try {
-                    const res = await fetch(`/api/suggestions/?query=${search}`);
-                    const data = await res.json();
-                    const dataArray = data.data;
-                    // console.log(dataArray);
-                    const namesArray = await dataArray.map(item => item.name);
-                    // console.log(namesArray);
+                    // const res = await fetch(`/api/suggestions/?query=${search}`);
+                    // const data = await res.json();
+                    // const dataArray = data.data;
+                    // // console.log(dataArray);
+                    // const namesArray = await dataArray.map(item => item.name);
+                    // // console.log(namesArray);
+                    const res = await getSuggestions(search);
+                    const namesArray = res;
                     setSearching(false);
                     setSuggestions(namesArray);
                 } catch (error) {
@@ -161,7 +164,7 @@ export default function SearchComponent() {
 
                 {
                     search && suggestions.length != 0 && !searching && 
-                        <div className="w-full overflow-auto max-h-[217px] rounded-b-xl overscroll-none">
+                        <div className="w-full overflow-auto max-h-72 rounded-b-xl overscroll-none">
                         {
                             suggestions.map((item, index) => {
                                 // Process the name such that its shorter
