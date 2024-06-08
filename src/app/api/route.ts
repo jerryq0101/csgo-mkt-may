@@ -6,9 +6,6 @@ import MongoDbConnection from "../lib/dbconnection";
 
 export async function GET(request: NextRequest) {
     try {
-        // const client = await clientPromise;
-        // const db = await client.db('items-data');
-        // const collection = await db.collection('properties');
         const client = await MongoDbConnection.getInstance();
         const db = await client.getDb();
         const collection = await db.collection('properties');
