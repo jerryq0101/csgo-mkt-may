@@ -139,7 +139,7 @@ export default function InterfaceGrid() {
                     <SearchComponent />
                     {/* <span className="text">1</span> */}
                 </div>
-                
+
                 {/* 2nd grid item */}
                 <div className="bg-neutral-200 flex flex-col rounded-xl"key="2" >
                     <DragComponent />
