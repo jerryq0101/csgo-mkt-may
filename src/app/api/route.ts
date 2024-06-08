@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic'
 
-import clientPromise from "../lib/mongodb"
 import { type NextRequest } from 'next/server'
 import MongoDbConnection from "../lib/dbconnection";
 
