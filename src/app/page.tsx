@@ -13,7 +13,7 @@ export default async function Home() {
               </div> */}
               <InterfaceGrid />
               <p className="text-zinc-400">
-                CSGO-Prices Dashboard <br/>
+                CSGO Prices Dashboard <br/>
                 Thanks <a className="no-underline" href="https://www.tradingview.com/">TradingView</a><br/>
                 (Made with 🐐 by jerryq0101)
               </p>
