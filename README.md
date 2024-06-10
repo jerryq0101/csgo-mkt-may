@@ -7,13 +7,13 @@ Current: A simple malleable dashboard with a Items Search, Price Chart and Item 
 <summary>Seeing data presented in an aesthetically pleasing manner on dashboards is satisfying.</summary>
 <br>
 
-Similar to why financial management dashboards like MercuryOS has risen successful, I believe dashboards molded with good design can become powerful operating systems for doing anything within some domain.
+Similar to why financial management dashboards like MercuryOS has risen successful, I believe dashboards molded with good design can become powerful operating systems in respective domains.
 
 Despite this project being risen out of simple love for CSGO, I believe that the concept of a *malleable* dashboard is applicable to any scenario where a user has to navigate to multiple sites to complete some action. Or, to manually copy and paste data into some spread sheet to perform analysis. 
 
-(Web3 especially, maybe a portfolio/broker/swap/lp/yieldfarm would be a good idea...)
+(Web3 especially, maybe a portfolio/broker/swap/lp/yieldfarm/malleable modules would be a good idea...)
 
-So many cool things can just be fucking dashboards. Maybe our OS can be a dashboard...
+So many cool things can just be fucking dashboards. Maybe macOS can just be a dashboard...
 </details>
 
 ## Running the Application
@@ -124,6 +124,137 @@ Github Setup
 8. After success, git clone the actual repository link.git
 9. [Credit](https://medium.com/@qylong2021/clone-organization-owned-private-repository-on-aws-ec2-instances-fb712dbf03ad)
 
+<br />
+<br />
+
+After the EC2 instance is setup with the git repo containing the script, one should run two autonomous processes through one command. Respectively [`nohup`](https://ioflood.com/blog/nohup-linux-command/#Getting_Started_with_Nohup) and [`crontab`](https://www.youtube.com/watch?v=7cbP7fzn0D8)
+
+#### nohup
+
+Nohup is used as a way to run tasks in terminal without an active terminal session. So a task can be started in a terminal session and be disconnected to run "by itself".
+
+In this program, I used nohup to start running the Node.js script so that it starts disconnected from the terminal itself (and I can close the ssh terminal and it would keep running): `nohup node ./scripts/data_scripts.js & disown`
+
+Mainly, `&` lets the program run in the background of the current terminal session (so that its not taking up space in your terminal), then `disown` detaches the background process from the current terminal session (or the shell's job table to be precise). So `&` would not make the process entirely independent, since it would still die as you kill the terminal session. 
+
+#### crontab
+
+Now that I am able to run a single independent process on an EC2 without having my SSH session connected after starting the task, I can now schedule the `nohup` process to trigger autonomously using `cron`.
+
+Cron is a super useful service in linux based systems that allow commands to be run periodically. Crontab commands generally come in this format
+
+`m h d m w <command>`
+
+The first m is the specific minute, h is the hour, d is day, second m is the month, and w is the specific weekday to run `<command>`
+
+So here I can run the nohup command above using cron to independently run the script on an EC2 instance.
+
+`0 0 */10 * * nohup node /home/csgo-mkt-may/scripts/data_script.js > output.txt & disown`
+
+(`> output.txt` directs the output of the nohup command to a specific file)
+
+
+## Setting up Frontend
+
+Here is just general React and Nextjs components, so I'll mainly share the stuff I learned (Moving from ReactJS to NextJS).
+* SSR vs CSR, App router and structuring API queries in NextJS
+* Singleton pattern connections to database (may not have been the best)
+* react-grid-layout
+
+### SSR and APIs
+
+Basically a way for Next to optimize rendering. Components which are static can be rendered on the server and sent to the client as pure HTML to minimize strain on client.
+
+This means the SSR components don't have abilities for interaction when rendered on client side, so it's really just good for static components which don't change (E.g. Landing pages). Pure HTML (CSS) being transmitted means that JS functionality, like hooks and functions that are run onClick, are not permitted. So if you are doing some hover effect, better do it through HTML.
+
+There weren't any substantial non-interactive components in this app. I just had to put "use client" on components which are client side rendered. `page.tsx` is server side rendered, that has client side children components. 
+
+----
+#### Making Requests in NextJS
+
+SSR is also a good way to abstract away making heavy requests directly from the client side, so you don't have to deal with useEffect BS. 
+
+    Big Context: There are mainly [4 ways](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating) to fetch data in NextJS
+1. On the server, with fetch
+2. On the server, with third-party libraries
+3. On the client, via a Route Handler
+4. On the client, with third-party libraries.
+
+
+**Fetching "on the server"** means that a server side rendered component needs fetched data initially when rendering/building.
+* (Static Generation option, SSG, will be specified on a `route.ts` file)
+NextJS will fetch the data on build and then combine that data with the server side HTML and send it to the client (only 1 request on build request).
+
+* (SSR, Dynamic Generation)
+On every render (site load), NextJS will send HTML with fresh data (request every render)
+
+**Fetching "on the client"**, client side component has interaction that triggers requests
+* Makes requests to the server, to tell it to make some request to the external service, every time the client component needs the data
+
+^ That way, the client does not bear too heavy of a network load and just needs to communicate with the server itself
+
+Now, I think NextJS explains Route Handlers the best.
+
+"Route Handlers allow you to create custom request handlers for a given route using the Web Request and Response APIs."
+
+![alt text](image.png) [Source](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
+
+```ts
+/* app/api/route.ts
+*/
+
+export async function GET() {
+  const res = await fetch('https://data.mongodb-api.com/...', {
+    headers: {
+      'Content-Type': 'application/json',
+      'API-Key': process.env.DATA_API_KEY,
+    },
+  })
+  const data = await res.json()
+ 
+  return Response.json({ data })
+}
+```
+
+Essentially, in the context above, when you make a GET request to `<domain>/api`, it's handled by the route.ts file's GET function.
+
+Like how routing works in NextJS, you can make other API routes by creating other `route.ts` files in different (nested) folders inside of the `/api` directory.
+
+So what I can do here is essentially define a route.ts based on a folder structure inside of `/api` and query MongoDB to give me the data I want
+
+#### Query Parameters
+
+To specify what item I wanted to get data for from MongoDB, I used NextRequest's [search params](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) object.
+
+```ts
+// Line 6
+export async function GET(request: NextRequest) {
+
+    ...
+
+    // Line 21
+    const searchParams = request.nextUrl.searchParams;
+    
+}
+```
+
+The NextRequest object makes it pretty easy to access details about the request. However, there's definitely more ways to pass data through requests as outlined through their documentation of making requests to route handlers.
+
+
+---
+### Singleton pattern
+
+This is essentially making sure that you don't make multiple connections to a database (E.g. MongoDB). 
+
+The Singleton pattern is the use of a JS class that has a static variable and static function. 
+
+This is useful because MongoDB's connection scheme creates a client instance that provides the initial connection, and uses that `MongoClient` instance to access the db and collection itself, to actually query data.
+
+So in `dbconnection.ts`, I've created a `static instance` so `static async getInstance()` will only make the `new MongoClient` instantiation connection only once in the application's lifetime. 
+
+(Talk more about staic methods and the actual framework of the singleton pattern)
+
+Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instance with duplicate variables (Nature of static keyword).
 
 
 ## Learn More about NextJS
