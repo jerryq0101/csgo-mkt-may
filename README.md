@@ -114,7 +114,16 @@ EC2 SSH
 6. You should see signs of success in terminal (Credits to this [tutorial](https://asf.alaska.edu/how-to/data-recipes/connect-to-ec2-with-ssh-mac-os-x/#:~:text=Connect%20to%20an%20EC2%20Instance,your%20Mac%20Terminal%20window%20later.))
 
 Github Setup
-1. 
+1. In the SSH, follow this [tutorial](https://medium.com/@rajani103/deploying-nodejs-app-on-aws-ec2-instance-step-by-step-1b00f807cdce) from step 3 to step 4 to setup
+2. In the root directory, if there's no /home, `mkdir` one 
+3. Execute `ssh-keygen -t ed25519 -a 100 -C "<your GitHub account email>"`
+4. Navigate to the `/.ssh` directory in the ec2 instance where the key pairs are stored 
+5. `cat <your-key-name.pub>` to display the key
+6. Add a deploy key in github settings and paste the output of the previous step into the key field
+7. Test connection to github: ssh -T git@github.comd
+8. After success, git clone the actual repository link.git
+9. [Credit](https://medium.com/@qylong2021/clone-organization-owned-private-repository-on-aws-ec2-instances-fb712dbf03ad)
+
 
 
 ## Learn More about NextJS
