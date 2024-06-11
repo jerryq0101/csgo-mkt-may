@@ -220,9 +220,17 @@ Essentially, in the context above, when you make a GET request to `<domain>/api`
 
 Like how routing works in NextJS, you can make other API routes by creating other `route.ts` files in different (nested) folders inside of the `/api` directory.
 
-So what I can do here is essentially define a route.ts based on a folder structure inside of `/api` and query MongoDB to give me the data I want
+What I did here is define a route.ts and a `async function GET(request: NextRequest)` inside of the `/api/route.ts` to query MongoDB.
+
+For example, I can do this in my app:
+```ts
+fetch("/api/").then(res => res.json())
+.then(res => console.log(res))
+```
 
 #### Query Parameters
+
+Now simple GET requests which do the same thing aren't interesting.
 
 To specify what item I wanted to get data for from MongoDB, I used NextRequest's [search params](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) object.
 
@@ -256,8 +264,14 @@ So in `dbconnection.ts`, I've created a `static instance` so `static async getIn
 
 Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instances with duplicate MongoClient variables (Nature of static keyword).
 
+More on [Singletons](https://javascriptpatterns.vercel.app/patterns/design-patterns/singleton-pattern).
+
 In essence, allowing the client to experience less load when using the application and cost savings in MongoDB. 
 
+
+## Other ReactJS Libraries used
+* [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
+* [lightweight-charts](https://www.tradingview.com/lightweight-charts/)
 
 ## Learn More about NextJS
 
