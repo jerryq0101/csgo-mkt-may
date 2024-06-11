@@ -9,7 +9,7 @@ Current: A simple malleable dashboard with a Items Search, Price Chart and Item 
 
 Similar to why financial management dashboards like MercuryOS has risen successful, I believe dashboards molded with good design can become powerful operating systems in respective domains.
 
-Despite this project being risen out of simple love for CSGO, I believe that the concept of a *malleable* dashboard is applicable to any scenario where a user has to navigate to multiple sites to complete some action. Or, to manually copy and paste data into some spread sheet to perform analysis. 
+Despite this project being risen out of simple love for CSGO, I believe that the concept of az *malleable* dashboard is applicable to any scenario where a user has to navigate to multiple sites to complete some action. Or, to manually copy and paste data into some spread sheet to perform analysis. 
 
 (Web3 especially, maybe a portfolio/broker/swap/lp/yieldfarm/malleable modules would be a good idea...)
 
@@ -254,7 +254,9 @@ So in `dbconnection.ts`, I've created a `static instance` so `static async getIn
 
 (Talk more about staic methods and the actual framework of the singleton pattern)
 
-Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instance with duplicate variables (Nature of static keyword).
+Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instances with duplicate MongoClient variables (Nature of static keyword).
+
+In essence, allowing the client to experience less load when using the application and cost savings in MongoDB. 
 
 
 ## Learn More about NextJS
