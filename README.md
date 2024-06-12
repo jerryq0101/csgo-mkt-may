@@ -13,7 +13,7 @@ Despite this project being risen out of simple love for CSGO, I believe that the
 
 (Web3 especially, maybe a portfolio/broker/swap/lp/yieldfarm/additional modules would be a good idea...)
 
-So many cool things can just be dashboards. Maybe macOS can just be a dashboard...
+So many cool things can just be dashboards.
 </details>
 
 ## Running the Application
@@ -159,7 +159,7 @@ So here I can run the nohup command above using cron to independently run the sc
 Here is just general React and Nextjs components, so I'll mainly share the stuff I learned (Moving from ReactJS to NextJS).
 * SSR vs CSR, App router and structuring API queries in NextJS
 * Singleton pattern connections to database (may not have been the best)
-* react-grid-layout
+* Promise + setTimeout pattern
 
 ### SSR and APIs
 
@@ -260,7 +260,7 @@ This is useful because MongoDB's connection scheme creates a client instance tha
 
 So in `dbconnection.ts`, I've created a `static instance` so `static async getInstance()` will only make the `new MongoClient` instantiation connection only once in the application's lifetime. 
 
-(Talk more about staic methods and the actual framework of the singleton pattern)
+(Talk more about static methods and the actual framework of the singleton pattern)
 
 Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instances with duplicate MongoClient variables (Nature of static keyword).
 
@@ -270,8 +270,75 @@ In essence, allowing the client to experience less load when using the applicati
 
 ---
 
-### Making an artificial Promise
+### Making an "Artificial" Promise
 
+(Likely) One of the huge inefficiencies with the project is its large quantities of queries to the MongoDB database that leads to high serverless costs. This is especially the case when price needs to be updated. 
+
+So, one of the optimizations that I've made in development was making search suggestions local as CSGO items are rather unchanging in medium timeframes (A list of 22418 items).
+
+Initially I did this:
+```ts
+// const searchText = ...
+// const itemsData = ...
+const itemSuggestions = itemsData.filter((itemName) => {
+  if (itemName.toLowerCase().includes(searchText)) {
+    return itemName;
+  } 
+})
+```
+
+But this f***ed up the app. Heavy non-async tasks like string searching through an item list of over twenty thousand was relatively slow (a few seconds, but slow enough to lag the app).
+
+Fundamentally, JavaScript is a single threaded event loop, and thus one can imagine it dealing with tasks one by one linearly (A worker and a callstack). 
+
+React, being built on top of JS, is still bound by the callstack nature of JS. State updates and user interaction of React are also "tasks" of the callstack.
+
+So if the current task of searching through suggestions is clogging the callstack, any user interaction with the site will be unresponsive until the task is done. 
+
+Well, if JS is linear, wouldn't even slower tasks like using a promise to fetch from an API freeze an app even more?
+
+Well promises + setTimeout utility is cool. They allow us to "queue" an asynchronous operation in the **background**.
+
+So, to improve UX and save $, I made the search suggestions operation and the item properties search operation local. 
+
+To do this, I can create a fake `Promise` and process the heavy task with the app bring conscious of the callstack
+
+To implement this, setTimeout needed to be understand more:
+* `setTimeout(...somefunc..., timeToWait)` is a function that waits `timeToWait` milliseconds before executing `somefunc`
+* But, the overlooked part of setTimeout is that it doesn't actually execute `somefunc` exactly after `timeToWait` ms, `timeToWait` ms is the minimum waited time before execution. 
+* This is because setTimeout's other condition is waiting before all other operations on the callstack have completed to then bring "focus" to this background task. This property has allowed processing patterns such as chunk processing, to separate the heavy code in the promise into different setTimeouts to have less interference with the callstack thus reducing lag.
+
+
+#### Important Distinction here:
+* `Promise` allows you to wait until some process is resolved.
+* `setTimeout` allows you to manage the heavier processing inside the promise such that reduces lag on the application
+
+For instance, fetching from an API wouldn't require you to use setTimeout because there is no truely heavy processing done by the callstack. Just a *boop* initially to contact the API and then the promise just sits in the background until that API *boop*s back to resolve the promise.
+
+But for my search suggestions case:
+```js
+// Suggestions.js - Line 5
+// For suggestions
+export function getSuggestions(query) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const result = search(query);
+            resolve(result);
+        })
+    })
+}
+
+// Search through the data for a match of the search
+function search(query) {
+    const itemNames = Object.keys(data);
+    return itemNames.filter((thing) => {
+        return thing.toLowerCase().includes(query.toLowerCase());
+    });
+}
+```
+The promise will not be resolved until the `const result = search(query)` is processed, so there is processing for our application callstack. And thus, I needed to put this in a setTimeout chunk to minimize clogging of the callstack considering other interactions (with 0ms as I don't need any delay in my setTimeout).
+
+Since my "heavy search task" actually only takes ~1-2 seconds, it suffices to be placed in one setTimeout. But, for **heavier** processes, it would be best to break a big `setTimeouts` into smaller `setTimeouts` inside of the `Promise`, which would run linearly and allow them to be inserted into the callstack in a more elegant fashion.
 
 ## Other ReactJS Libraries used
 * [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
