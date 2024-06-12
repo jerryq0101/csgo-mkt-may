@@ -82,7 +82,7 @@ export default function PropertiesComponent() {
 
 
                         {
-                            color === "#8650AC" ? <SpecialPill /> : <NormalPill />
+                            color === "8650AC" ? <SpecialPill /> : <NormalPill />
                         }
 
                         {
