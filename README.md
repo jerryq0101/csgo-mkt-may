@@ -1,7 +1,7 @@
 # CSGO's Dune Analytics
 This is a [Next.js](https://nextjs.org/) project bootstrapped with ReactJS. Additionally, MongoDB and an EC2 instance are used.
 
-Current: A simple malleable dashboard with a Items Search, Price Chart and Item Detail
+Current: A simple malleable dashboard with an Items Search, Price Chart and Item Detail
 
 <details>
 <summary>Seeing data presented in an aesthetically pleasing manner on dashboards is satisfying.</summary>
@@ -9,11 +9,11 @@ Current: A simple malleable dashboard with a Items Search, Price Chart and Item 
 
 Similar to why financial management dashboards like MercuryOS has risen successful, I believe dashboards molded with good design can become powerful operating systems in respective domains.
 
-Despite this project being risen out of simple love for CSGO, I believe that the concept of az *malleable* dashboard is applicable to any scenario where a user has to navigate to multiple sites to complete some action. Or, to manually copy and paste data into some spread sheet to perform analysis. 
+Despite this project being risen out of simple love for CSGO, I believe that the concept of a *malleable* dashboard is applicable to any scenario where a user has to navigate to multiple sites to complete some action. Or, to manually copy and paste data into some spread sheet to perform analysis. 
 
-(Web3 especially, maybe a portfolio/broker/swap/lp/yieldfarm/malleable modules would be a good idea...)
+(Web3 especially, maybe a portfolio/broker/swap/lp/yieldfarm/additional modules would be a good idea...)
 
-So many cool things can just be fucking dashboards. Maybe macOS can just be a dashboard...
+So many cool things can just be dashboards. Maybe macOS can just be a dashboard...
 </details>
 
 ## Running the Application
