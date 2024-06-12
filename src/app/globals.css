@@ -156,3 +156,22 @@ body {
 .draggable-handle {
   
 }
+
+.image-crop-container {
+  overflow: hidden;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  position: relative;
+}
+
+.image-crop {
+  position: absolute;
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  min-height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

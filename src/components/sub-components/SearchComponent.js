@@ -102,13 +102,7 @@ export default function SearchComponent() {
             return `${name} (${wear})`;
         
     }
-
-    const controls = useDragControls()
-
-    function startDrag(event) {
-        controls.start(event)
-    }
-
+    
     /*
         Alternatively, it can accept a ref to another component created with 
         React's useRef hook. This ref should be passed both to the draggable 
