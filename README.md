@@ -252,15 +252,29 @@ The NextRequest object makes it pretty easy to access details about the request.
 ---
 ### Singleton pattern
 
-This is essentially making sure that you don't make multiple connections to a database (E.g. MongoDB). 
+The singleton pattern makes sure that there is only one global instance of a class exists. It helps in my case to ensure that only one database instance exists (E.g. MongoDB). 
 
 The Singleton pattern is the use of a JS class that has a static variable and static function. 
 
-This is useful because MongoDB's connection scheme creates a client instance that provides the initial connection, and uses that `MongoClient` instance to access the db and collection itself, to actually query data.
+In `dbconnection.ts`, I've created a `static instance` so `static async getInstance()` will only make the `new MongoClient` instantiation connection only once in the application's lifetime, saving a lot of money. 
 
-So in `dbconnection.ts`, I've created a `static instance` so `static async getInstance()` will only make the `new MongoClient` instantiation connection only once in the application's lifetime. 
+```ts
+export default class MongoDbConnection {
+  // Static variables and methods that belong to the class rather than a specific instance (so there will only be *one* of each)
+  private static instance: MongoDbConnection;
+  // ...
+  public static async gssssssssetInstance(): Promise<MongoDbConnection> {
+        // The crux of the singleton pattern is the if statment to prevent repeat instantiation
+        if (!MongoDbConnection.instance) {
+            MongoDbConnection.instance = new MongoDbConnection();
+            await MongoDbConnection.instance.connect();
+        }
+        return MongoDbConnection.instance;
+}
+// ...
+}
+```
 
-(Talk more about static methods and the actual framework of the singleton pattern)
 
 Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instances with duplicate MongoClient variables (Nature of static keyword).
 
@@ -339,6 +353,12 @@ function search(query) {
 The promise will not be resolved until the `const result = search(query)` is processed, so there is processing for our application callstack. And thus, I needed to put this in a setTimeout chunk to minimize clogging of the callstack considering other interactions (with 0ms as I don't need any delay in my setTimeout).
 
 Since my "heavy search task" actually only takes ~1-2 seconds, it suffices to be placed in one setTimeout. But, for **heavier** processes, it would be best to break a big `setTimeouts` into smaller `setTimeouts` inside of the `Promise`, which would run linearly and allow them to be inserted into the callstack in a more elegant fashion.
+
+There are plenty of resources on the above, so don't hesitate to do a quick google search.
+
+#### The end: I think this is pretty much it for my learnings. Happy deving
+
+---
 
 ## Other ReactJS Libraries used
 * [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
