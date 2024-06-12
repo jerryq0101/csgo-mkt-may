@@ -74,9 +74,9 @@ Notes: Install Node.js
 
 To have a meaningful dashboard, I needed data. So I used someone else's items data [SteamAPI](https://steamapis.com/) (don't roast me for this, need to learn how to make a scraper)
 
-### Query Script
+### Query Script (NOTE, Script is not currently active, MONGO too expensive)
 
-So I made a script to query the api, take the csgo item data, and shove it into MongoDB. (`data_scripts.js`)
+I made a script to query the api, take the csgo item data, and shove it into MongoDB. (`data_scripts.js`)
 
 In `data_scripts.js` I combined the functionality of updating and getting data together, meaning that this script works to initially get data, and then update data periodically on the EC2 instance. 
 

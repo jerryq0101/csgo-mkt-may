@@ -5,6 +5,7 @@ import {Responsive, WidthProvider} from "react-grid-layout";
 import DragComponent from "./sub-components/DragComponent";
 import SearchComponent from "./sub-components/SearchComponent";
 import ChartComponent from "./sub-components/ChartComponent";
+import PropertiesComponent from "./sub-components/PropertiesComponent";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -147,6 +148,13 @@ export default function InterfaceGrid() {
                         <ChartComponent />
                     </div>
                     {/* <span className="text">2</span> */}
+                </div>
+
+                {/* Third Grid Item */}
+                <div className="bg-neutral-200 flex flex-col rounded-xl"key="3">
+                    <DragComponent />
+
+                    <PropertiesComponent />
                 </div>
             </ResponsiveGridLayout>
         </>
