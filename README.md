@@ -1,7 +1,7 @@
 # CSGO's Dune Analytics
 This is a [Next.js](https://nextjs.org/) project bootstrapped with ReactJS. Additionally, MongoDB and an EC2 instance are used.
 
-Current: A simple malleable dashboard with an Items Search, Price Chart and Item Detail
+Current: A simple malleable dashboard with an Items Search, Price Chart and Item Properties
 
 <details>
 <summary>Seeing data presented in an aesthetically pleasing manner on dashboards is satisfying.</summary>
@@ -38,10 +38,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 
 **Backend** 
 1. **Mongo** Database containing a collection of items-data, and their {name, price_history} specifically
-2. AWS **EC2** Instance running a NodeJS script periodically (10 days) to update Mongo Database (due to the api rate limit)
+2. AWS **EC2** Instance running a NodeJS script periodically to update Mongo Database (due to low $, not running)
 
 **Frontend**
-1. NextJS, Tailwindcss, React Grid Layout: MongoDB processes price history queries from each query of dynamic api request from next server
+1. NextJS - Router API queries MongoDB price histories on item select, TailwindCSS.
 
 
 ```
@@ -62,8 +62,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
             └── InterfaceGrid.js
 ```
 Notes:
-* `misc` has files that help with auto suggestions of the search (instead of querying mongodb every single time)
-* `scripts` contains the test script and actual script running in the EC2 instance to load and update the MongoDB database 
+* `misc` has files that help with auto suggestions and item properties of search (instead of querying mongodb every single time)
+* `scripts` contains the test script (`query_one`) and actual script (`data_script`) running in the EC2 instance to load and update the MongoDB database 
 * `src/` is all frontend code (which will be explained below)
 
 
@@ -72,19 +72,19 @@ Notes:
 ## The Backend : Creating the script and setting up MongoDB & AWS
 Notes: Install Node.js
 
-To have a meaningful dashboard, I needed data. So I used someone else's items data [SteamAPI](https://steamapis.com/) (don't roast me for this, need to learn how to make a scraper)
+To have a meaningful dashboard, I needed data. So I used someone else's items data [SteamAPI](https://steamapis.com/) (don't roast me for this, I need to learn later on how to make a scraper)
 
 ### Query Script (NOTE, Script is not currently active, MONGO too expensive)
 
-I made a script to query the api, take the csgo item data, and shove it into MongoDB. (`data_scripts.js`)
+I made a script to query the SteamAPI, take the CSGO item data, and shove it into MongoDB. (`data_scripts.js`)
 
 In `data_scripts.js` I combined the functionality of updating and getting data together, meaning that this script works to initially get data, and then update data periodically on the EC2 instance. 
 
-The driver function `async function fetchData()` loops through through  each item name stored locally in `items_list.json`:
+The driver function `async function fetchData()` loops through each item name stored locally in `items_list.json`:
 
-* If item alreaddy exists -> checks if item prices are old* <br /> (yes) -> updates item prices via a new query to SteamAPI <br/>
+* If item already exists -> checks if item prices are old* <br /> (yes) -> updates item prices via a new query to SteamAPI <br/>
 (no) -> doesn't do anything
-* If Item doesn't alreay exist -> Add the obj to MongoDB
+* If Item doesn't already exist -> Add the object to MongoDB
 
 MongoDB Notes:
 * Initial DB Connection in NodeJS needs to be setup according to [this](https://www.mongodb.com/docs/drivers/node/current/quick-start/connect-to-mongodb/) (`async function setup()`)
@@ -94,17 +94,17 @@ MongoDB Notes:
 
 I learned the most about handling rate limits while creating this script. Here's a list of all possible [status codes](https://www.webfx.com/web-development/glossary/http-status-codes/)
 
-Full disclaimer here, as I have only encountered a 429 error while running the script (assuming that I do have a correct API key), I wrote the script to handle such a scenario only: via delays.
+Full disclaimer here, as I have only encountered a 429 error while running the script (assuming that there is a valid API key), I wrote the script to handle such a scenario only: via delays.
 * 429 is the api rate exceeded error
 
-This was handled by the `function delay(ms)` that would initialize a new promise that contained a `setTimeout(() => resolve, ms)` to artificially delay the entire NodeJS program. This works because by design of `fetchData()` and other functions that interact with MongoDB being `async`, it's effectively a synchronous program that waits for execution of `delay(some ms)`. 
+This was handled by the `function delay(ms)` that would initialize a new promise that contained a `setTimeout(() => resolve, ms)` to artificially delay the entire NodeJS program. This works because by design of `fetchData()` and other functions that interact with MongoDB being `async`. This resulted in effectively a synchronous program that waits for execution of `delay(some ms)`. 
 <br />
 <br />
 
 ### Setting up AWS 
 
 EC2 SSH
-1. Log on to AWS and have a credit card (charged 1 dollar to make an account)
+1. Log on to AWS and have a credit card
 2. Create an Linux/Ubuntu EC2 instance through their interface 
     * In the key pair I chose to get a RSA .pem key
     * Also a security group that aallowed SSH traffic from the anywhere
@@ -133,21 +133,21 @@ After the EC2 instance is setup with the git repo containing the script, one sho
 
 Nohup is used as a way to run tasks in terminal without an active terminal session. So a task can be started in a terminal session and be disconnected to run "by itself".
 
-In this program, I used nohup to start running the Node.js script so that it starts disconnected from the terminal itself (and I can close the ssh terminal and it would keep running): `nohup node ./scripts/data_scripts.js & disown`
+In this program, I used nohup to start running the Node.js script so it disconnects from the terminal on start (and it would keep running): `nohup node ./scripts/data_scripts.js & disown`
 
 Mainly, `&` lets the program run in the background of the current terminal session (so that its not taking up space in your terminal), then `disown` detaches the background process from the current terminal session (or the shell's job table to be precise). So `&` would not make the process entirely independent, since it would still die as you kill the terminal session. 
 
-#### crontab
+#### cron
 
-Now that I am able to run a single independent process on an EC2 without having my SSH session connected after starting the task, I can now schedule the `nohup` process to trigger autonomously using `cron`.
+Now that I am able to run a single independent process on an EC2 without having my SSH session connected after starting the task, I can now schedule the `nohup` process to start autonomously using `cron`.
 
-Cron is a super useful service in linux based systems that allow commands to be run periodically. Crontab commands generally come in this format
+Cron is a super useful service in linux based systems that allow commands to be run periodically. The crontab is the task scheduler of cron. Crontab commands generally come in this format
 
 `m h d m w <command>`
 
 The first m is the specific minute, h is the hour, d is day, second m is the month, and w is the specific weekday to run `<command>`
 
-So here I can run the nohup command above using cron to independently run the script on an EC2 instance.
+So here I can run the nohup command above using cron to independently run the script on an EC2 instance. I put this into the crontab of my EC2 instance. 
 
 `0 0 */10 * * nohup node /home/csgo-mkt-may/scripts/data_script.js > output.txt & disown`
 
@@ -156,7 +156,7 @@ So here I can run the nohup command above using cron to independently run the sc
 
 ## Setting up Frontend
 
-Here is just general React and Nextjs components, so I'll mainly share the stuff I learned (Moving from ReactJS to NextJS).
+Here are just general React and NextJS knowledge, so I'll mainly share the stuff I learned.
 * SSR vs CSR, App router and structuring API queries in NextJS
 * Singleton pattern connections to database (may not have been the best)
 * Promise + setTimeout pattern
@@ -165,16 +165,17 @@ Here is just general React and Nextjs components, so I'll mainly share the stuff
 
 Basically a way for Next to optimize rendering. Components which are static can be rendered on the server and sent to the client as pure HTML to minimize strain on client.
 
-This means the SSR components don't have abilities for interaction when rendered on client side, so it's really just good for static components which don't change (E.g. Landing pages). Pure HTML (CSS) being transmitted means that JS functionality, like hooks and functions that are run onClick, are not permitted. So if you are doing some hover effect, better do it through HTML.
+This means the SSR components don't have abilities for interaction when rendered on client side, so it's really just good for static components which don't change (E.g. Landing pages). Pure HTML (CSS) being transmitted means that JS functionality, like hooks and functions that are run onClick, are not permitted. So if you are doing some hover effect, better do it through CSS.
 
 There weren't any substantial non-interactive components in this app. I just had to put "use client" on components which are client side rendered. `page.tsx` is server side rendered, that has client side children components. 
 
 ----
 #### Making Requests in NextJS
 
-SSR is also a good way to abstract away making heavy requests directly from the client side, so you don't have to deal with useEffect BS. 
+SSR is also a good way to abstract away making heavy requests directly from the client side, so its less work for the client.
 
-    Big Context: There are mainly [4 ways](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating) to fetch data in NextJS
+> Big Context: There are mainly [4 ways](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating) to fetch data in NextJS
+  
 1. On the server, with fetch
 2. On the server, with third-party libraries
 3. On the client, via a Route Handler
@@ -183,24 +184,26 @@ SSR is also a good way to abstract away making heavy requests directly from the 
 
 **Fetching "on the server"** means that a server side rendered component needs fetched data initially when rendering/building.
 * (Static Generation option, SSG, will be specified on a `route.ts` file)
-NextJS will fetch the data on build and then combine that data with the server side HTML and send it to the client (only 1 request on build request).
+NextJS will fetch the data on build and then combine that data with the server side HTML and send it to the client (only 1 request is executed on build).
 
 * (SSR, Dynamic Generation)
 On every render (site load), NextJS will send HTML with fresh data (request every render)
 
 **Fetching "on the client"**, client side component has interaction that triggers requests
-* Makes requests to the server, to tell it to make some request to the external service, every time the client component needs the data
+* Makes requests to the server, to tell it to make some request to the external service every time the client component needs the data (likely triggered by user interaction)
 
-^ That way, the client does not bear too heavy of a network load and just needs to communicate with the server itself
+* That way, the client does not bear too heavy of a network load and just needs to communicate with the server itself
 
 Now, I think NextJS explains Route Handlers the best.
 
-"Route Handlers allow you to create custom request handlers for a given route using the Web Request and Response APIs."
+>"Route Handlers allow you to create custom request handlers for a given route using the Web Request and Response APIs."
 
 ![alt text](image.png) [Source](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
 
 ```ts
-/* app/api/route.ts
+/*
+Example route (not this project) 
+app/api/route.ts
 */
 
 export async function GET() {
@@ -218,9 +221,9 @@ export async function GET() {
 
 Essentially, in the context above, when you make a GET request to `<domain>/api`, it's handled by the route.ts file's GET function.
 
-Like how routing works in NextJS, you can make other API routes by creating other `route.ts` files in different (nested) folders inside of the `/api` directory.
+Like how routing works in NextJS, you can make other API routes by creating other `route.ts` files in different (nested) folders inside the `/api` directory.
 
-What I did here is define a route.ts and a `async function GET(request: NextRequest)` inside of the `/api/route.ts` to query MongoDB.
+What I did here is define a route.ts and a `async function GET(request: NextRequest)` inside the `/api/route.ts` to query MongoDB.
 
 For example, I can do this in my app:
 ```ts
@@ -230,7 +233,7 @@ fetch("/api/").then(res => res.json())
 
 #### Query Parameters
 
-Now simple GET requests which do the same thing aren't interesting.
+Now simple GET requests in routes which do the same thing aren't interesting.
 
 To specify what item I wanted to get data for from MongoDB, I used NextRequest's [search params](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) object.
 
@@ -252,7 +255,7 @@ The NextRequest object makes it pretty easy to access details about the request.
 ---
 ### Singleton pattern
 
-The singleton pattern makes sure that there is only one global instance of a class exists. It helps in my case to ensure that only one database instance exists (E.g. MongoDB). 
+The singleton pattern makes sure that there is only one global instance of a class exists. It helps in my case to ensure that only one database instance exists on setup (MongoDB). 
 
 The Singleton pattern is the use of a JS class that has a static variable and static function. 
 
@@ -276,7 +279,7 @@ export default class MongoDbConnection {
 ```
 
 
-Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instances with duplicate MongoClient variables (Nature of static keyword).
+Note: We need the `static` variable and `static` method in the class so it's not possible to have multiple instances with duplicate `MongoClient` variables (Nature of static keyword).
 
 More on [Singletons](https://javascriptpatterns.vercel.app/patterns/design-patterns/singleton-pattern).
 
@@ -286,11 +289,11 @@ In essence, allowing the client to experience less load when using the applicati
 
 ### Making an "Artificial" Promise
 
-(Likely) One of the huge inefficiencies with the project is its large quantities of queries to the MongoDB database that leads to high serverless costs. This is especially the case when price needs to be updated. 
+One of the huge inefficiencies with the project is its large quantities of queries to the MongoDB database that leads to high serverless instance costs. This is especially the case when price needs to be updated. 
 
 So, one of the optimizations that I've made in development was making search suggestions local as CSGO items are rather unchanging in medium timeframes (A list of 22418 items).
 
-Initially I did this:
+Initially I just did this:
 ```ts
 // const searchText = ...
 // const itemsData = ...
@@ -315,9 +318,9 @@ Well promises + setTimeout utility is cool. They allow us to "queue" an asynchro
 
 So, to improve UX and save $, I made the search suggestions operation and the item properties search operation local. 
 
-To do this, I can create a fake `Promise` and process the heavy task with the app bring conscious of the callstack
+To do this, I can create a `Promise` and process the heavy task with the app being conscious of the callstack
 
-To implement this, setTimeout needed to be understand more:
+To implement this, I understood setTimeout more:
 * `setTimeout(...somefunc..., timeToWait)` is a function that waits `timeToWait` milliseconds before executing `somefunc`
 * But, the overlooked part of setTimeout is that it doesn't actually execute `somefunc` exactly after `timeToWait` ms, `timeToWait` ms is the minimum waited time before execution. 
 * This is because setTimeout's other condition is waiting before all other operations on the callstack have completed to then bring "focus" to this background task. This property has allowed processing patterns such as chunk processing, to separate the heavy code in the promise into different setTimeouts to have less interference with the callstack thus reducing lag.
@@ -350,15 +353,19 @@ function search(query) {
     });
 }
 ```
-The promise will not be resolved until the `const result = search(query)` is processed, so there is processing for our application callstack. And thus, I needed to put this in a setTimeout chunk to minimize clogging of the callstack considering other interactions (with 0ms as I don't need any delay in my setTimeout).
+The promise will not be resolved until the `const result = search(query)` is processed, so there is processing for our application callstack. And thus, I needed to put this in a setTimeout chunk to minimize clogging of the callstack considering other interactions (with 0ms).
 
-Since my "heavy search task" actually only takes ~1-2 seconds, it suffices to be placed in one setTimeout. But, for **heavier** processes, it would be best to break a big `setTimeouts` into smaller `setTimeouts` inside of the `Promise`, which would run linearly and allow them to be inserted into the callstack in a more elegant fashion.
+Since my "heavy search task" actually only takes ~1-2 seconds, it suffices to be placed in one setTimeout. But, for **heavier** processes, it would be best to break a big `setTimeout` into smaller non-nested `setTimeouts` inside the `Promise`, which would run linearly and allow them to be inserted into the callstack in a more elegant fashion.
 
 There are plenty of resources on the above, so don't hesitate to do a quick google search.
 
-#### The end: I think this is pretty much it for my learnings. Happy deving
 
----
+#### The end: and misc notes
+
+(react-grid-layout) Component first mounts and then potentially calls an onChange function, and then useEffect runs. So, design app in way that doesn't self destroy saved external data configuration. 
+
+Application of setTimeout in different places: NodeJS server side vs getSuggestions on the client side. On the server side, I made every function that associated with a promise an async function, and used await on every promise. This way `data_script.js` was essentially a synchronous process which didn't need/have a background queue. I then used setTimeout to delay the purely linear program (which did always have an empty callstack). On the client side, `Suggestions.js`, setTimeout was used as a tool to wait until the callstack from user interactions was empty and process query suggestions later, reducing perceived lag.
+
 
 ## Other ReactJS Libraries used
 * [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)

@@ -69,7 +69,6 @@ export default function InterfaceGrid() {
         isBounded: ?boolean = false
     }
     */
-    
 
     // // Search = 2 col version
     const defaultLayout = {
