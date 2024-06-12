@@ -268,6 +268,10 @@ More on [Singletons](https://javascriptpatterns.vercel.app/patterns/design-patte
 
 In essence, allowing the client to experience less load when using the application and cost savings in MongoDB. 
 
+---
+
+### Making an artificial Promise
+
 
 ## Other ReactJS Libraries used
 * [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)

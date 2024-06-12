@@ -76,27 +76,27 @@ export default function InterfaceGrid() {
         "xxl": [
             { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
             { i: "2", w: 4, h: 1, x: 3, y: 0, minW: 3, minH: 1 },
-            { i: "3", w: 1, h: 1, x: 5, y: 0, minW: 1, minH: 1 },
+            { i: "3", w: 4, h: 1, x: 5, y: 1, minW: 3, minH: 1, maxW: 4 },
         ],
         "xl": [
             { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
             { i: "2", w: 3, h: 1, x: 3, y: 0, minW: 3, minH: 1 },
-            { i: "3", w: 1, h: 1, x: 5, y: 0, minW: 1, minH: 1 },
+            { i: "3", w: 3, h: 1, x: 5, y: 1, minW: 3, minH: 1, maxW: 4 },
         ],
         "lg": [
             { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
             { i: "2", w: 3, h: 1, x: 3, y: 0, minW: 3, minH: 1 },
-            { i: "3", w: 2, h: 1, x: 5, y: 0, minW: 2, minH: 1 },
+            { i: "3", w: 3, h: 1, x: 5, y: 1, minW: 3, minH: 1, maxW: 4 },
         ],
         "md": [
             { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
             { i: "2", w: 2, h: 1, x: 3, y: 0, minW: 2, minH: 1 },
-            { i: "3", w: 2, h: 1, x: 5, y: 0, minW: 2, minH: 1 },
+            { i: "3", w: 2, h: 1, x: 5, y: 1, minW: 2, minH: 1, maxW: 4 },
         ],
         "sm": [
             { i: "1", w: 2, h: 1, x: 0, y: 0, minW: 2, minH: 1 },
             { i: "2", w: 2, h: 1, x: 3, y: 0, minW: 2, minH: 1 },
-            { i: "3", w: 1, h: 1, x: 5, y: 0, minW: 1, minH: 1 },
+            { i: "3", w: 2, h: 1, x: 5, y: 1, minW: 2, minH: 1, maxW: 4 },
         ],
     }
 
@@ -142,7 +142,7 @@ export default function InterfaceGrid() {
                 </div>
 
                 {/* 2nd grid item */}
-                <div className="bg-neutral-200 flex flex-col rounded-xl"key="2" >
+                <div className="bg-neutral-200 flex flex-col rounded-xl" key="2" >
                     <DragComponent />
                     <div className="pt-5">
                         <ChartComponent />
@@ -150,8 +150,8 @@ export default function InterfaceGrid() {
                     {/* <span className="text">2</span> */}
                 </div>
 
-                {/* Third Grid Item */}
-                <div className="bg-neutral-200 flex flex-col rounded-xl"key="3">
+                {/* 3rd Grid Item */}
+                <div className="bg-neutral-200 flex flex-col rounded-xl" key="3">
                     <DragComponent />
 
                     <PropertiesComponent />
