@@ -21,8 +21,8 @@ export default function PropertiesComponent() {
                     const priceData = res.prices;
                     const priceRow = priceData.safe_ts;
                     const volumeRow = priceData.sold;
-                    setTableData([priceRow.last_7d, priceRow.last_30d, priceRow.last_90d],
-                        [volumeRow.last_7d, volumeRow.last_30d, volumeRow.last_90d]
+                    setTableData([[priceRow.last_7d, priceRow.last_30d, priceRow.last_90d],
+                        [volumeRow.last_7d, volumeRow.last_30d, volumeRow.last_90d]]
                     )
                     
                     // Set Color
@@ -103,9 +103,9 @@ export default function PropertiesComponent() {
                         </thead>
                         <tbody>
                             <tr>
-                                <td className="px-3 py-3 border-r-2 border-zinc-600">239.64</td>
-                                <td className="px-3 py-3 border-r-2 border-zinc-600">239.64</td>
-                                <td className="px-3 py-3">239.64</td>
+                                <td className="px-3 py-3 border-r-2 border-zinc-600">{tableData.length != 0 ? tableData[0][0] : 239.64}</td>
+                                <td className="px-3 py-3 border-r-2 border-zinc-600">{tableData.length != 0 ? tableData[0][1] : 239.64}</td>
+                                <td className="px-3 py-3">{tableData.length != 0 ? tableData[0][2] : 239.64}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -114,16 +114,16 @@ export default function PropertiesComponent() {
                     <table className="w-fit table-auto border-2 border-zinc-600 rounded-md border-separate">
                         <thead>
                             <tr>
-                                <th className="px-3 py-3 border-b-2 border-r-2 border-zinc-600">#_7d_avg</th>
-                                <th className="px-3 py-3 border-b-2 border-r-2 border-zinc-600">#_30d_avg</th>
-                                <th className="px-3 py-3 border-b-2 border-zinc-600">#_90d_avg</th>
+                                <th className="px-3 py-3 border-b-2 border-r-2 border-zinc-600">#_7d</th>
+                                <th className="px-3 py-3 border-b-2 border-r-2 border-zinc-600">#_30d</th>
+                                <th className="px-3 py-3 border-b-2 border-zinc-600">#_90d</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td className="px-3 py-3 border-r-2 border-zinc-600">239.64</td>
-                                <td className="px-3 py-3 border-r-2 border-zinc-600">239.64</td>
-                                <td className="px-3 py-3">239.64</td>
+                                <td className="px-3 py-3 border-r-2 border-zinc-600">{tableData.length != 0 ? tableData[1][0] : 239.64}</td>
+                                <td className="px-3 py-3 border-r-2 border-zinc-600">{tableData.length != 0 ? tableData[1][1] : 239.64}</td>
+                                <td className="px-3 py-3">{tableData.length != 0 ? tableData[1][2] : 239.64}</td>
                             </tr>
                         </tbody>
                     </table>
