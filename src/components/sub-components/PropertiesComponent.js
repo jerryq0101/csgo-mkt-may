@@ -72,9 +72,8 @@ export default function PropertiesComponent() {
     // 2. Figure out how to format images DONE
     // image and table resizing 
     // 3. Combine Context logic and local search for properties.
-
     return (
-        <div className="px-[50px] py-14 text-zinc-600 flex h-full justify-center ">
+        <div className="px-[50px] py-16 text-zinc-600 flex h-full justify-center ">
             <div className="flex gap-5 flex-row w-fit">
                 <div className="flex flex-col py-5 gap-3 w-fit">
                     {croppedImage} 
@@ -82,7 +81,7 @@ export default function PropertiesComponent() {
 
 
                         {
-                            color === "8650AC" ? <SpecialPill /> : <NormalPill />
+                            color === "#8650AC" ? <SpecialPill /> : color ==="#CF6A32" ? <StattrakPill /> : <NormalPill />
                         }
 
                         {
@@ -91,7 +90,6 @@ export default function PropertiesComponent() {
                     </div>
                 </div>
                 <div className="flex flex-col gap-5 w-fit">
-
                     {/* Prices Table */}
                     <table className="w-fit table-auto border-2 border-zinc-600 rounded-md border-separate">
                         <thead>
@@ -136,7 +134,7 @@ export default function PropertiesComponent() {
 // Price activity pills
 function UnstablePill() {
     return (
-        <div className="text-sm w-fit px-[15px] rounded-md py-[10px] border-2 border-sky-300 bg-sky-300/10 text-sky-300">
+        <div className=" w-fit px-[15px] rounded-md py-[10px] border-2 border-sky-300 bg-sky-300/10 text-sky-300">
             Unstable
         </div>
     )
