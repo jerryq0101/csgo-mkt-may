@@ -67,7 +67,7 @@ Notes:
 * `src/` is all frontend code (which will be explained below)
 
 
-# Process in making this project
+# Process in making this project (WARNING - LONG READ)
 
 ## The Backend : Creating the script and setting up MongoDB & AWS
 Notes: Install Node.js
