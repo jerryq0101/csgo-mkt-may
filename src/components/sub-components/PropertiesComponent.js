@@ -78,8 +78,7 @@ export default function PropertiesComponent() {
                 <div className="flex flex-col py-5 gap-3 w-fit">
                     {croppedImage} 
                     <div className="w-full flex justify-center gap-3">
-
-
+        
                         {
                             color === "#8650AC" ? <SpecialPill /> : color ==="#CF6A32" ? <StattrakPill /> : <NormalPill />
                         }
