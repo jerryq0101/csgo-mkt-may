@@ -1,7 +1,10 @@
 # CSGO's Dune Analytics
-This is a [Next.js](https://nextjs.org/) project bootstrapped with ReactJS. Additionally, MongoDB and an EC2 instance are used.
-
 Current: A simple malleable dashboard with an Items Search, Price Chart and Item Properties
+
+## Demo
+
+[Link](https://www.loom.com/share/b5f6e56e6e504972ac10061429309b86?sid=d792640a-a90e-45fc-96be-26e0ebf8a2d3)
+
 
 <details>
 <summary>Seeing data presented in an aesthetically pleasing manner on dashboards is satisfying.</summary>
@@ -15,10 +18,6 @@ Despite this project being risen out of simple love for CSGO, I believe that the
 
 So many cool things can just be dashboards.
 </details>
-
-## Demo
-
-[Link](https://www.loom.com/share/b5f6e56e6e504972ac10061429309b86?sid=d792640a-a90e-45fc-96be-26e0ebf8a2d3)
 
 ## Running the Application
 
