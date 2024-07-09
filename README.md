@@ -1,5 +1,5 @@
 # CSGO's Dune Analytics
-Current: A simple malleable dashboard with an Items Search, Price Chart and Item Properties
+Current: A simple malleable dashboard with an Items Search, Price Chart and Item Properties (with AWS, MongoDB)
 
 ## Demo
 
