@@ -5,6 +5,7 @@ Current: A simple malleable dashboard with an Items Search, Price Chart and Item
 
 [Link](https://www.loom.com/share/b5f6e56e6e504972ac10061429309b86?sid=d792640a-a90e-45fc-96be-26e0ebf8a2d3)
 
+<br />
 
 <details>
 <summary>Seeing data presented in an aesthetically pleasing manner on dashboards is satisfying.</summary>
